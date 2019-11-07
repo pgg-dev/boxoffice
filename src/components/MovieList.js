@@ -19,17 +19,17 @@ function MovieList({ onChange, onClick, movies, date }) {
           <MdSearch />
         </button>
       </div>
-      <span className="dateInfo">
+      {/* <span className="dateInfo">
         {moment(date.toString()).format("YYYY년 M월 D일")} 기준
-      </span>
+      </span> */}
       <div className="movies">
         {movies.map(movie => (
           <div className="movie" key={movie.rank}>
             <h1 className="rank">{movie.rank}</h1>
             <Link to={`/${movie.rank}`}>
-              <img className="poster" src={movie.posters} alt={movie.movieNm} />
+              <img className="poster" src={movie.poster} alt={movie.title} />
             </Link>
-            <span className="title">{movie.movieNm}</span>
+            <span className="title">{movie.title}</span>
           </div>
         ))}
       </div>

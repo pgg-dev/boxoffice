@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import moment from "moment";
+import React from "react";
 import styled from "styled-components";
 
 const MovieInfo = styled.div`
@@ -48,19 +47,19 @@ function Movie({ movie, isLogin }) {
   console.log(isLogin);
   return (
     <MovieInfo>
-      <Img src={movie.posters} alt={movie.movieNm} />
-      <Title>{movie.movieNm}</Title>
+      <Img src={movie.poster} alt={movie.title} />
+      <Title>{movie.title}</Title>
 
       <List>
         <Line />
-        <li>개봉일 : {moment(movie.openDt).format("YYYY년 M월 D일")}</li>
+        <li>개봉일 : {movie.openDt}</li>
         <li>
           장르 : {movie.genre} / {movie.runtime}분
         </li>
-        <li>등급 : {movie.rating[0].ratingGrade}</li>
-        <li>감독 : {movie.director[0].directorNm}</li>
+        <li>등급 : {movie.grade}</li>
+        <li>감독 : {movie.director}</li>
         <li>
-          배우 : {movie.actor[0].actorNm}, {movie.actor[1].actorNm}
+          배우 : {movie.actors[0]}, {movie.actors[1]}
         </li>
         <Line />
       </List>

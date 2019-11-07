@@ -6,9 +6,7 @@ import MovieList from "../components/MovieList";
 function MovieListContainer() {
   console.log("MovieListContainer");
 
-  const { data, loading, error, date } = useSelector(
-    state => state.movies.movies
-  );
+  const { data, loading, error } = useSelector(state => state.movies.movies);
   const dispatch = useDispatch();
 
   let changeDate = "";
@@ -24,8 +22,8 @@ function MovieListContainer() {
 
   useEffect(() => {
     if (data) return;
-    dispatch(getMovies(date));
-  }, [dispatch, data, date]);
+    dispatch(getMovies(changeDate));
+  }, [dispatch]);
 
   if (loading && !data) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;
@@ -36,7 +34,7 @@ function MovieListContainer() {
       onChange={handleChange}
       onClick={handleClick}
       movies={data}
-      date={date}
+      // date={date}
     />
   );
 }

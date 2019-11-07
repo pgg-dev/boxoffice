@@ -6,7 +6,7 @@ function MoviePage({ match }) {
   const { rank } = match.params;
 
   console.log(match);
-  return <MovieContainer rank={rank} />;
+  return <MovieContainer rank={parseInt(rank)} />;
 }
 
 export default MoviePage;

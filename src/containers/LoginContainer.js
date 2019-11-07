@@ -20,7 +20,26 @@ function LoginContainer() {
   };
 
   const responseKakao = res => {
+    // window.Kakao.API.request({
+    //   url: "/v1/user/unlink",
+    //   success: function(res) {
+    //     console.log(res);
+    //   },
+    //   fail: function(error) {
+    //     alert(JSON.stringify(error));
+    //   }
+    // });
+    window.Kakao.API.request({
+      url: "/v2/user/me",
+      success: function(res) {
+        console.log(res);
+      },
+      fail: function(error) {
+        alert(JSON.stringify(error));
+      }
+    });
     console.log(res);
+
     loginProvider("kakao");
   };
 

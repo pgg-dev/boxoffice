@@ -26,7 +26,7 @@ export const setHeaderVisibility = visible => async dispatch => {
   dispatch({ type: SET_HEADER_VISIBILITY, visible });
 };
 
-export const setLogin = provider => async dispatch => {
+export const setLogin = (provider, id) => async dispatch => {
   console.log("modules/setLogin");
   dispatch({ type: SET_LOGIN });
   try {
@@ -163,24 +163,79 @@ export const setLogout = () => async dispatch => {
 
 ////////////////////////
 
-export const getMovies = date => async dispatch => {
-  console.log("modules/getMovies");
-  dispatch({ type: GET_MOVIES, date });
-  const start = Date.now();
+// const response = date => {
+//   console.log("///////////response///////////////");
+//   axios
+//     .get(
+//       "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
+//       {
+//         params: {
+//           key: "8512edd89b714bf2cf35fcb50adac48d",
+//           targetDt: date
+//         }
+//       }
+//     )
+//     .then(async data => {
+//       const rankingData = data.data.boxOfficeResult.dailyBoxOfficeList;
+//       console.log(rankingData);
+//       for (let i = 0; i < rankingData.length; i++) {
+//         axios
+//           .get(
+//             "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
+//             {
+//               params: {
+//                 ServiceKey: "JIB0YUBGVC07GLD5WFBD",
+//                 collection: "kmdb_new",
+//                 title: rankingData[i].movieNm,
+//                 releaseDts: rankingData[i].openDt.replace(/-/gi, "")
+//               }
+//             }
+//           )
+//           .then(data => {
+//             const items = data.data.Data[0];
 
-  let docRef = firestore.collection("movies").doc(date.toString());
+//             if (items.hasOwnProperty("Result")) {
+//               const detailData = data.data.Data[0].Result[0];
+//               console.log(detailData);
+//               if (detailData.posters.includes("|"))
+//                 detailData.posters = detailData.posters.substring(
+//                   0,
+//                   detailData.posters.indexOf("|")
+//                 );
 
-  const writeData = () => {
-    let docRef = firestore.collection("movies").doc(date);
+//               let docRef = firestore
+//                 .collection(date.toString())
+//                 .doc(rankingData[i].rank);
 
-    let setAda = docRef.set({
-      first: "Ada",
-      last: "Lovelace",
-      born: 1815
-    });
-    console.log(setAda);
-    this.readData();
-  };
+//               docRef.set(
+//                 {
+//                   rank: parseInt(rankingData[i].rank),
+//                   title: rankingData[i].movieNm,
+//                   poster: detailData.posters,
+//                   openDt: moment(rankingData[i].openDt).format(
+//                     "YYYY년 M월 D일"
+//                   ),
+//                   grade: detailData.rating[0].ratingGrade,
+//                   genre: detailData.genre,
+//                   director: detailData.director[0].directorNm,
+//                   actors: [
+//                     detailData.actor[0].actorNm,
+//                     detailData.actor[1].actorNm
+//                   ],
+//                   plot: detailData.plot
+//                 },
+//                 { merge: true }
+//               );
+//             }
+//           })
+//           .then(() => console.log("끝!!!!!!!"));
+//       }
+//     });
+// };
+
+const response = date => async dispatch => {
+  console.log("///////////response///////////////");
+  const totalData = [];
 
   const {
     data: {
@@ -214,26 +269,39 @@ export const getMovies = date => async dispatch => {
         .then(data => {
           let items = data.data.Data[0];
           if (items.hasOwnProperty("Result")) {
-            const secoundInfo = items.Result[0];
+            const detailData = items.Result[0];
 
-            console.log(secoundInfo);
-            if (secoundInfo.posters.includes("|"))
-              secoundInfo.posters = secoundInfo.posters.substring(
+            console.log(detailData);
+            if (detailData.posters.includes("|"))
+              detailData.posters = detailData.posters.substring(
                 0,
-                secoundInfo.posters.indexOf("|")
+                detailData.posters.indexOf("|")
               );
 
-            Object.assign(rankingData[i], secoundInfo);
+            let docRef = firestore
+              .collection("movies")
+              .doc(date.toString())
+              .collection("movieList")
+              .doc(rankingData[i].rank);
 
-            docRef.set({
-              rank: rankingData[i].rank,
-              title: rankingData[i].movieNm,
-              poster: secoundInfo.posters,
-              openDt: moment(rankingData[i].openDt).format("YYYY년 M월 D일"),
-              genre: secoundInfo.genre,
-              director: secoundInfo.director[0].directorNm,
-              plot: secoundInfo.plot
-            });
+            docRef.set(
+              {
+                rank: parseInt(rankingData[i].rank),
+                title: rankingData[i].movieNm,
+                poster: detailData.posters,
+                openDt: moment(rankingData[i].openDt).format("YYYY년 M월 D일"),
+                grade: detailData.rating[0].ratingGrade,
+                genre: detailData.genre,
+                runtime: detailData.runtime,
+                director: detailData.director[0].directorNm,
+                actors: [
+                  detailData.actor[0].actorNm,
+                  detailData.actor[1].actorNm
+                ],
+                plot: detailData.plot
+              },
+              { merge: true }
+            );
           } else {
             return rankingData[i];
           }
@@ -241,14 +309,115 @@ export const getMovies = date => async dispatch => {
     }
   };
 
-  Promise.all([rankingData, getData()])
-    .then(() => {
-      console.log(Date.now() - start);
-      const payload = rankingData;
-      dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
-    })
-    .catch(e => {
-      dispatch({ type: GET_MOVIES_ERROR, error: e, date });
+  Promise.all([rankingData, getData()]).then(() => {
+    dispatch(getMovies(date));
+  });
+};
+
+// const {
+//   data: {
+//     boxOfficeResult: { dailyBoxOfficeList: rankingData }
+//   }
+// } = await axios.get(
+//   "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
+//   {
+//     params: {
+//       key: "8512edd89b714bf2cf35fcb50adac48d",
+//       targetDt: date
+//     }
+//   }
+//   ).then(async() => {
+//     console.log(rankingData);
+//     for (let i = 0; i < rankingData.length; i++) {
+//       await axios
+//         .get(
+//           "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
+//           {
+//             params: {
+//               ServiceKey: "JIB0YUBGVC07GLD5WFBD",
+//               collection: "kmdb_new",
+//               title: rankingData[i].movieNm,
+//               releaseDts: rankingData[i].openDt.replace(/-/gi, "")
+//             }
+//           }
+//         )
+//         .then(data => {
+//           const items = data.data.Data[0];
+//           if (items.hasOwnProperty("Result")) {
+//             const detailData = items.Result[0];
+//             console.log(detailData);
+//             if (detailData.posters.includes("|"))
+//               detailData.posters = detailData.posters.substring(
+//                 0,
+//                 detailData.posters.indexOf("|")
+//               );
+
+//             let docRef = firestore.collection(date.toString()).doc();
+
+//             docRef.set(
+//               {
+//                 rank: parseInt(rankingData[i].rank),
+//                 title: rankingData[i].movieNm,
+//                 poster: detailData.posters,
+//                 openDt: moment(rankingData[i].openDt).format("YYYY년 M월 D일"),
+//                 grade: detailData.rating[0].ratingGrade,
+//                 genre: detailData.genre,
+//                 director: detailData.director[0].directorNm,
+//                 actors: [
+//                   detailData.actor[0].actorNm,
+//                   detailData.actor[1].actorNm
+//                 ],
+//                 plot: detailData.plot
+//               },
+//               { merge: true }
+//             );
+//           } else {
+//             return rankingData[i];
+//           }
+//         });
+//     }
+
+//   })
+
+// Promise.all([rankingData, getData()])
+//   .then(() => {
+//     // console.log(Date.now() - start);
+//     getMovies(date);
+//   })
+//   .catch(e => {
+//     // dispatch({ type: GET_MOVIES_ERROR, error: e, date });
+//   });
+
+export const getMovies = date => async dispatch => {
+  console.log("modules/getMovies");
+  console.log(date);
+  if (date === "") {
+    date = moment().format("YYYYMMDD") - 1;
+  }
+
+  firestore
+    .collection("movies")
+    .doc(date.toString())
+    .collection("movieList")
+    .orderBy("rank", "asc")
+    .get()
+    .then(snapshot => {
+      // console.log(snapshot);
+      console.log("//////////////////////");
+
+      if (snapshot.empty) {
+        dispatch(response(date));
+      } else {
+        dispatch({ type: GET_MOVIES, date });
+        const rows = [];
+
+        snapshot.forEach(doc => {
+          const childData = doc.data();
+          rows.push(childData);
+        });
+        const payload = rows;
+        dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
+      }
     });
 };
 
@@ -274,7 +443,8 @@ const initialState = {
     loading: false,
     data: null,
     error: null,
-    date: moment().format("YYYYMMDD") - 1
+    date: null
+    // date: moment().format("YYYYMMDD") - 1
   },
   movie: {
     loading: false,

@@ -21,18 +21,14 @@ function HeaderContainer() {
   const onLogout = () => {
     console.log("onLogout");
     if (provider === "kakao") {
-      if (window.Kakao.hasOwnProperty("Auth")) {
-        window.Kakao.Auth.logout();
-        console.log("카카오 로그아웃 성공");
-        dispatch(setLogout());
-        window.sessionStorage.clear();
-      } else {
+      if (!window.Kakao.hasOwnProperty("Auth")) {
         window.Kakao.init("09cacdaaabf08e5b95d7d9c603f1361b");
-        window.Kakao.Auth.logout();
-        console.log("카카오 로그아웃 성공");
-        dispatch(setLogout());
-        window.sessionStorage.clear();
       }
+
+      window.Kakao.Auth.logout();
+      console.log("카카오 로그아웃 성공");
+      dispatch(setLogout());
+      window.sessionStorage.clear();
     } else {
       if (window.gapi.hasOwnProperty("auth2")) {
         const logout = window.gapi.auth2.getAuthInstance();
@@ -58,19 +54,19 @@ function HeaderContainer() {
         dispatch(setLogout());
       }
     }
-    // switch (provider) {
-    //   case "kakao":
-    //     return window.Kakao.Auth.logout();
-    //   case "google":
-    //     const logout = window.gapi.auth2.getAuthInstance();
-    //     logout.signOut();
-    //     return console.log("구글 로그아웃 성공");
-    //   default:
-    //     break;
-    // }
-    // dispatch(setLogout());
-    // window.sessionStorage.clear();
   };
+  // switch (provider) {
+  //   case "kakao":
+  //     return window.Kakao.Auth.logout();
+  //   case "google":
+  //     const logout = window.gapi.auth2.getAuthInstance();
+  //     logout.signOut();
+  //     return console.log("구글 로그아웃 성공");
+  //   default:
+  //     break;
+  // }
+  // dispatch(setLogout());
+  // window.sessionStorage.clear();
 
   return <Header loginStatus={status} onLogout={onLogout} />;
 }
