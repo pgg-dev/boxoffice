@@ -42,7 +42,7 @@ const PlotContent = styled.p`
   grid-area: plotContent;
 `;
 
-function Movie({ movie, isLogin, writer, comment, onChange, onClick }) {
+function Movie({ movie, isLogin, comment, onChange, onClick }) {
   console.log("components/Movie");
 
   return (
@@ -81,17 +81,13 @@ function Movie({ movie, isLogin, writer, comment, onChange, onClick }) {
       </div>
 
       <div>
-        {comment ? (
-          <ul>
-            {comment.map((content, index) => (
-              <li key={index}>
-                <p> {content.text}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          console.log("//////////빔!!!!!!!!!!!!")
-        )}
+        <ul>
+          {comment.map((content, index) => (
+            <li key={index}>
+              <p> {content.text}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </MovieInfo>
   );

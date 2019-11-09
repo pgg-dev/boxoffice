@@ -63,8 +63,8 @@ export const setLogout = () => async dispatch => {
   dispatch({ type: SET_LOGOUT });
 };
 
-const response = date => async dispatch => {
-  console.log("///////////response///////////////");
+export const setMovies = date => async dispatch => {
+  console.log("///////////setMovies///////////////");
 
   const {
     data: {
@@ -146,6 +146,8 @@ const response = date => async dispatch => {
 export const getMovies = date => async dispatch => {
   console.log("modules/getMovies");
 
+  dispatch({ type: GET_MOVIES });
+
   if (date === "") {
     date = moment().format("YYYYMMDD") - 1;
   }
@@ -157,19 +159,13 @@ export const getMovies = date => async dispatch => {
     .orderBy("rank", "asc")
     .get()
     .then(snapshot => {
-      if (snapshot.empty) {
-        dispatch(response(date));
-      } else {
-        dispatch({ type: GET_MOVIES });
-        const rows = [];
-
-        snapshot.forEach(doc => {
-          const childData = doc.data();
-          rows.push(childData);
-        });
-        const payload = rows;
-        dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
-      }
+      const rows = [];
+      snapshot.forEach(doc => {
+        const childData = doc.data();
+        rows.push(childData);
+      });
+      const payload = rows;
+      dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
     });
 };
 
