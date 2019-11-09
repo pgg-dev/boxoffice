@@ -42,9 +42,9 @@ const PlotContent = styled.p`
   grid-area: plotContent;
 `;
 
-function Movie({ movie, isLogin }) {
+function Movie({ movie, isLogin, writer, comment, onChange, onClick }) {
   console.log("components/Movie");
-  console.log(isLogin);
+
   return (
     <MovieInfo>
       <Img src={movie.poster} alt={movie.title} />
@@ -68,13 +68,30 @@ function Movie({ movie, isLogin }) {
 
       <div>
         <textarea
+          onChange={onChange}
           placeholder={
             isLogin
               ? "영화 리뷰를 작성해 주세요."
               : "로그인 후 이용가능한 서비스입니다."
           }
+          readOnly={!isLogin}
+          // disabled={!isLogin}
         ></textarea>
-        <button>입력</button>
+        <button onClick={onClick}>입력</button>
+      </div>
+
+      <div>
+        {comment ? (
+          <ul>
+            {comment.map((content, index) => (
+              <li key={index}>
+                <p> {content.text}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          console.log("//////////빔!!!!!!!!!!!!")
+        )}
       </div>
     </MovieInfo>
   );

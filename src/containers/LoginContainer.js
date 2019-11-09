@@ -16,45 +16,34 @@ function LoginContainer() {
 
   const responseGoogle = res => {
     console.log(res);
-    loginProvider("google");
+    loginProvider("google", res.googleId);
   };
 
   const responseKakao = res => {
-    // window.Kakao.API.request({
-    //   url: "/v1/user/unlink",
-    //   success: function(res) {
-    //     console.log(res);
-    //   },
-    //   fail: function(error) {
-    //     alert(JSON.stringify(error));
-    //   }
-    // });
+    console.log(res);
     window.Kakao.API.request({
       url: "/v2/user/me",
-      success: function(res) {
+      success: res => {
         console.log(res);
+        loginProvider("kakao", res.id);
       },
-      fail: function(error) {
-        alert(JSON.stringify(error));
+      fail: error => {
+        console.log(error);
       }
     });
-    console.log(res);
-
-    loginProvider("kakao");
   };
 
   const responseFail = err => {
     console.error(err);
   };
 
-  const loginProvider = provider => {
+  const loginProvider = (provider, id) => {
     window.sessionStorage.setItem("provider", provider);
 
     // window.localStorage.setItem("kakaoAuth", res);
 
     dispatch(goToHome());
-
-    dispatch(setLogin(provider));
+    dispatch(setLogin(provider, id));
   };
 
   return (

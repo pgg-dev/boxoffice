@@ -3,7 +3,6 @@ import GoogleLogin from "react-google-login";
 import KakaoLogin from "react-kakao-login";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 const Container = styled.div`
   display: flex;

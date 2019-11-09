@@ -23,7 +23,8 @@ function MovieListContainer() {
   useEffect(() => {
     if (data) return;
     dispatch(getMovies(changeDate));
-  }, [dispatch]);
+  }, [dispatch, changeDate]);
+  //data 의존성 추가하면 날짜값 재설정시 계속 호출됨
 
   if (loading && !data) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;

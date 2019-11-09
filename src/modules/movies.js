@@ -17,6 +17,9 @@ const GET_MOVIE = "GET_MOVIE";
 const GET_MOVIE_SUCCESS = "GET_MOVIE_SUCCESS";
 const GET_MOVIE_ERROR = "GET_MOVIE_ERROR";
 
+const GET_COMMENT_SUCCESS = "GET_COMMENT_SUCCESS";
+const GET_COMMENT_ERROR = "GET_COMMENT_ERROR";
+
 export const goToHome = () => (dispatch, getState, { history }) => {
   history.push("/");
 };
@@ -28,9 +31,28 @@ export const setHeaderVisibility = visible => async dispatch => {
 
 export const setLogin = (provider, id) => async dispatch => {
   console.log("modules/setLogin");
-  dispatch({ type: SET_LOGIN });
   try {
-    dispatch({ type: SET_LOGIN_SUCCESS, provider });
+    firestore
+      .collection("users")
+      .where("id", "==", id)
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          let docRef = firestore.collection("users").doc();
+
+          docRef.set(
+            {
+              provider: provider,
+              id: id
+            },
+            { merge: true }
+          );
+        }
+        // snapshot .forEach(doc  => {
+        //   console.log(doc.id, "=>", doc .data());
+        // });
+      });
+    dispatch({ type: SET_LOGIN_SUCCESS, id, provider });
   } catch (e) {
     dispatch({ type: SET_LOGIN_ERROR });
   }
@@ -41,201 +63,8 @@ export const setLogout = () => async dispatch => {
   dispatch({ type: SET_LOGOUT });
 };
 
-///////////////////////////
-// export const getMovies = date => async dispatch => {
-//   console.log("modules/getMovies");
-//   dispatch({ type: GET_MOVIES, date });
-//   const start = Date.now();
-
-//   axios
-//     .get(
-//       "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-//       {
-//         params: {
-//           key: "8512edd89b714bf2cf35fcb50adac48d",
-//           targetDt: date
-//         }
-//       }
-//     )
-//     .then(async data => {
-//       const firstData = data.data.boxOfficeResult.dailyBoxOfficeList;
-//       console.log(firstData);
-
-//       for (let i = 0; i < firstData.length; i++) {
-//         await axios
-//           .get(
-//             "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-//             {
-//               params: {
-//                 ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-//                 collection: "kmdb_new",
-//                 title: firstData[i].movieNm,
-//                 releaseDts: firstData[i].openDt.replace(/-/gi, "")
-//               }
-//             }
-//           )
-//           .then(data => {
-//             if (data.data.Data[0].Result[0]) {
-//               const secoundInfo = data.data.Data[0].Result[0];
-//               console.log(secoundInfo);
-//               if (secoundInfo.posters.includes("|"))
-//                 secoundInfo.posters = secoundInfo.posters.substring(
-//                   0,
-//                   secoundInfo.posters.indexOf("|")
-//                 );
-//               Object.assign(firstData[i], secoundInfo);
-//             }
-//           });
-//       } //for 끝
-//       console.log(Date.now() - start);
-//       const payload = firstData;
-//       dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
-//     })
-//     .catch(e => {
-//       dispatch({ type: GET_MOVIES_ERROR, error: e, date });
-//     });
-// };
-
-//////////////////////////////
-
-// export const getMovies = date => async dispatch => {
-//   console.log("modules/getMovies");
-//   dispatch({ type: GET_MOVIES, date });
-//   const start = Date.now();
-//   const {
-//     data: {
-//       boxOfficeResult: { dailyBoxOfficeList: rankingData }
-//     }
-//   } = await axios.get(
-//     "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-//     {
-//       params: {
-//         key: "8512edd89b714bf2cf35fcb50adac48d",
-//         targetDt: date
-//       }
-//     }
-//   );
-
-//   const getData = async () => {
-//     console.log(rankingData);
-//     for (let i = 0; i < rankingData.length; i++) {
-//       await axios
-//         .get(
-//           "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-//           {
-//             params: {
-//               ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-//               collection: "kmdb_new",
-//               title: rankingData[i].movieNm,
-//               releaseDts: rankingData[i].openDt.replace(/-/gi, "")
-//             }
-//           }
-//         )
-//         .then(data => {
-//           let items = data.data.Data[0];
-//           if (items.hasOwnProperty("Result")) {
-//             const secoundInfo = items.Result[0];
-//             console.log(secoundInfo);
-//             if (secoundInfo.posters.includes("|"))
-//               secoundInfo.posters = secoundInfo.posters.substring(
-//                 0,
-//                 secoundInfo.posters.indexOf("|")
-//               );
-
-//             Object.assign(rankingData[i], secoundInfo);
-//           } else {
-//             return rankingData[i];
-//           }
-//         });
-//     }
-//   };
-
-//   Promise.all([rankingData, getData()])
-//     .then(() => {
-//       console.log(Date.now() - start);
-//       const payload = rankingData;
-//       dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
-//     })
-//     .catch(e => {
-//       dispatch({ type: GET_MOVIES_ERROR, error: e, date });
-//     });
-// };
-
-////////////////////////
-
-// const response = date => {
-//   console.log("///////////response///////////////");
-//   axios
-//     .get(
-//       "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-//       {
-//         params: {
-//           key: "8512edd89b714bf2cf35fcb50adac48d",
-//           targetDt: date
-//         }
-//       }
-//     )
-//     .then(async data => {
-//       const rankingData = data.data.boxOfficeResult.dailyBoxOfficeList;
-//       console.log(rankingData);
-//       for (let i = 0; i < rankingData.length; i++) {
-//         axios
-//           .get(
-//             "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-//             {
-//               params: {
-//                 ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-//                 collection: "kmdb_new",
-//                 title: rankingData[i].movieNm,
-//                 releaseDts: rankingData[i].openDt.replace(/-/gi, "")
-//               }
-//             }
-//           )
-//           .then(data => {
-//             const items = data.data.Data[0];
-
-//             if (items.hasOwnProperty("Result")) {
-//               const detailData = data.data.Data[0].Result[0];
-//               console.log(detailData);
-//               if (detailData.posters.includes("|"))
-//                 detailData.posters = detailData.posters.substring(
-//                   0,
-//                   detailData.posters.indexOf("|")
-//                 );
-
-//               let docRef = firestore
-//                 .collection(date.toString())
-//                 .doc(rankingData[i].rank);
-
-//               docRef.set(
-//                 {
-//                   rank: parseInt(rankingData[i].rank),
-//                   title: rankingData[i].movieNm,
-//                   poster: detailData.posters,
-//                   openDt: moment(rankingData[i].openDt).format(
-//                     "YYYY년 M월 D일"
-//                   ),
-//                   grade: detailData.rating[0].ratingGrade,
-//                   genre: detailData.genre,
-//                   director: detailData.director[0].directorNm,
-//                   actors: [
-//                     detailData.actor[0].actorNm,
-//                     detailData.actor[1].actorNm
-//                   ],
-//                   plot: detailData.plot
-//                 },
-//                 { merge: true }
-//               );
-//             }
-//           })
-//           .then(() => console.log("끝!!!!!!!"));
-//       }
-//     });
-// };
-
 const response = date => async dispatch => {
   console.log("///////////response///////////////");
-  const totalData = [];
 
   const {
     data: {
@@ -314,83 +143,9 @@ const response = date => async dispatch => {
   });
 };
 
-// const {
-//   data: {
-//     boxOfficeResult: { dailyBoxOfficeList: rankingData }
-//   }
-// } = await axios.get(
-//   "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-//   {
-//     params: {
-//       key: "8512edd89b714bf2cf35fcb50adac48d",
-//       targetDt: date
-//     }
-//   }
-//   ).then(async() => {
-//     console.log(rankingData);
-//     for (let i = 0; i < rankingData.length; i++) {
-//       await axios
-//         .get(
-//           "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-//           {
-//             params: {
-//               ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-//               collection: "kmdb_new",
-//               title: rankingData[i].movieNm,
-//               releaseDts: rankingData[i].openDt.replace(/-/gi, "")
-//             }
-//           }
-//         )
-//         .then(data => {
-//           const items = data.data.Data[0];
-//           if (items.hasOwnProperty("Result")) {
-//             const detailData = items.Result[0];
-//             console.log(detailData);
-//             if (detailData.posters.includes("|"))
-//               detailData.posters = detailData.posters.substring(
-//                 0,
-//                 detailData.posters.indexOf("|")
-//               );
-
-//             let docRef = firestore.collection(date.toString()).doc();
-
-//             docRef.set(
-//               {
-//                 rank: parseInt(rankingData[i].rank),
-//                 title: rankingData[i].movieNm,
-//                 poster: detailData.posters,
-//                 openDt: moment(rankingData[i].openDt).format("YYYY년 M월 D일"),
-//                 grade: detailData.rating[0].ratingGrade,
-//                 genre: detailData.genre,
-//                 director: detailData.director[0].directorNm,
-//                 actors: [
-//                   detailData.actor[0].actorNm,
-//                   detailData.actor[1].actorNm
-//                 ],
-//                 plot: detailData.plot
-//               },
-//               { merge: true }
-//             );
-//           } else {
-//             return rankingData[i];
-//           }
-//         });
-//     }
-
-//   })
-
-// Promise.all([rankingData, getData()])
-//   .then(() => {
-//     // console.log(Date.now() - start);
-//     getMovies(date);
-//   })
-//   .catch(e => {
-//     // dispatch({ type: GET_MOVIES_ERROR, error: e, date });
-//   });
-
 export const getMovies = date => async dispatch => {
   console.log("modules/getMovies");
-  console.log(date);
+
   if (date === "") {
     date = moment().format("YYYYMMDD") - 1;
   }
@@ -402,13 +157,10 @@ export const getMovies = date => async dispatch => {
     .orderBy("rank", "asc")
     .get()
     .then(snapshot => {
-      // console.log(snapshot);
-      console.log("//////////////////////");
-
       if (snapshot.empty) {
         dispatch(response(date));
       } else {
-        dispatch({ type: GET_MOVIES, date });
+        dispatch({ type: GET_MOVIES });
         const rows = [];
 
         snapshot.forEach(doc => {
@@ -421,8 +173,6 @@ export const getMovies = date => async dispatch => {
     });
 };
 
-////////////////////////
-
 export const getMovie = rank => async dispatch => {
   console.log("modules/getMovie");
   dispatch({ type: GET_MOVIE });
@@ -433,10 +183,55 @@ export const getMovie = rank => async dispatch => {
   }
 };
 
+export const getComment = (date, rank) => async dispatch => {
+  console.log("getComment");
+  try {
+    firestore
+      .collection("movies")
+      .doc(date.toString())
+      .collection("movieList")
+      .where("rank", "==", rank)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          if (doc.data().comment !== undefined) {
+            const comment = doc.data().comment;
+            const payload = comment;
+            dispatch({ type: GET_COMMENT_SUCCESS, payload });
+          }
+        });
+      });
+  } catch (e) {
+    dispatch({ type: GET_COMMENT_ERROR, error: e });
+  }
+};
+
+export const addComment = (changComment, rank, date) => async dispatch => {
+  try {
+    let docRef = firestore
+      .collection("movies")
+      .doc(date.toString())
+      .collection("movieList")
+      .doc(rank.toString());
+
+    docRef.set(
+      {
+        comment: changComment
+      },
+      { merge: true }
+    );
+
+    dispatch(getComment(date, rank));
+  } catch (e) {
+    dispatch({ type: GET_COMMENT_ERROR, error: e });
+  }
+};
+
 const initialState = {
   visible: true,
   login: {
     status: false,
+    id: null,
     provider: null
   },
   movies: {
@@ -444,13 +239,13 @@ const initialState = {
     data: null,
     error: null,
     date: null
-    // date: moment().format("YYYYMMDD") - 1
   },
   movie: {
     loading: false,
     data: null,
     error: null
-  }
+  },
+  comment: []
 };
 
 export default function movies(state = initialState, action) {
@@ -466,7 +261,8 @@ export default function movies(state = initialState, action) {
         ...state,
         login: {
           status: false,
-          provider: null
+          id: null,
+          type: null
         }
       };
     case SET_LOGIN_SUCCESS:
@@ -474,6 +270,7 @@ export default function movies(state = initialState, action) {
         ...state,
         login: {
           status: true,
+          id: action.id,
           provider: action.provider
         }
       };
@@ -482,7 +279,7 @@ export default function movies(state = initialState, action) {
         ...state,
         login: {
           status: false,
-          provider: action.provider
+          id: null
         }
       };
     case SET_LOGOUT:
@@ -490,7 +287,7 @@ export default function movies(state = initialState, action) {
         ...state,
         login: {
           status: false,
-          provider: action.provider
+          id: null
         }
       };
 
@@ -543,7 +340,8 @@ export default function movies(state = initialState, action) {
           loading: false,
           data: state.movies.data.find(movie => movie.rank === action.rank),
           error: null
-        }
+        },
+        comment: []
       };
     case GET_MOVIE_ERROR:
       return {
@@ -553,6 +351,16 @@ export default function movies(state = initialState, action) {
           data: null,
           error: action.error
         }
+      };
+    case GET_COMMENT_SUCCESS:
+      return {
+        ...state,
+        comment: action.payload
+      };
+    case GET_COMMENT_ERROR:
+      return {
+        ...state,
+        comment: null
       };
     default:
       return state;
