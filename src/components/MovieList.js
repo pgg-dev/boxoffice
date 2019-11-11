@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../style/MovieList.css";
 import { MdSearch } from "react-icons/md";
+import moment from "moment";
 
 function MovieList({ onChange, onClick, movies, date }) {
   console.log("components/MovieList");
@@ -25,7 +26,7 @@ function MovieList({ onChange, onClick, movies, date }) {
         {movies.map(movie => (
           <div className="movie" key={movie.rank}>
             <h1 className="rank">{movie.rank}</h1>
-            <Link to={`/${movie.rank}`}>
+            <Link to={`/boxoffice/${movie.rank}`}>
               <img className="poster" src={movie.poster} alt={movie.title} />
             </Link>
             <span className="title">{movie.title}</span>

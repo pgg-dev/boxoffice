@@ -14,8 +14,6 @@
   border: 2px solid #03cf5d;
   background: white;
   margin-bottom: 80px;
-  align-content: center;
-  justify-content: center;
 }
 .inputData {
   flex: 1;

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getMovies, setMovies } from "../modules/movies";
+import { getMovies } from "../modules/movies";
 import MovieList from "../components/MovieList";
 
 function MovieListContainer() {
@@ -17,10 +17,11 @@ function MovieListContainer() {
 
   const handleClick = e => {
     console.log("handleClick");
-    dispatch(setMovies(changeDate));
+    dispatch(getMovies(changeDate));
   };
 
   useEffect(() => {
+    console.log("************************useEffect/////////");
     if (data) return;
     dispatch(getMovies(changeDate));
   }, [dispatch]);

@@ -10,18 +10,11 @@
   font-family: "Viga", sans-serif;
   letter-spacing: 5px;
   margin: 30px;
-  color: #03cf5d;
 }
 
 .homeLink {
   text-decoration: none;
-}
-
-.loginLink {
-  display: flex;
-  box-sizing: border-box;
-  justify-content: flex-end;
-  text-decoration: none;
+  color: #03cf5d;
 }
 
 .loginButton {
@@ -32,8 +25,13 @@
   font-family: "Nanum Gothic", sans-serif;
   font-weight: 800;
   background: #03cf5d;
-  color: white;
   border: 3px solid #03cf5d;
   border-radius: 20px;
-  cursor: pointer;
+}
+
+.loginLink {
+  box-sizing: border-box;
+  justify-content: flex-end;
+  text-decoration: none;
+  color: white;
 }

@@ -1,5 +1,43 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# BOX OFFICE
+
+## About
+
+특정 날짜를 검색하면 해당 일자의 박스오피스 정보를 제공합니다. 첫 페이지는 어제 일자 기준입니다.
+
+## Features
+
+- SNS 계정을 통한 회원가입 및 로그인
+- 날짜를 통한 박스오피스 검색
+- 영화 별 댓글 입력 및 삭제
+
+## Detailed Function
+
+### LoginPage
+
+### MovieListPage
+
+### MoviePage
+
+## Following technologies are used
+
+- react
+- react-dom
+- react-router-dom
+- react-redux
+- redux
+- redux-logger
+- redux-thunk
+- redux-devtools-extension
+- react-kakao-login
+- react-google-login
+- react-icons
+- axios
+- firebase
+- moment
+- styled-components
+
 ## Available Scripts
 
 In the project directory, you can run:

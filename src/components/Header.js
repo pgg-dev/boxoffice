@@ -9,26 +9,24 @@ function Header({ loginStatus, onLogin, onLogout }) {
   return (
     <div className="header">
       {loginStatus ? (
-        <Link to="/" className="loginLink">
-          <button className="loginButton" onClick={onLogout}>
+        <button className="loginButton" onClick={onLogout}>
+          <Link to="/" className="loginLink">
             로그아웃
-          </button>
-        </Link>
+          </Link>
+        </button>
       ) : (
-        <Link
-          to="/login"
-          className="loginLink"
-          state={{ test: window.location.pathname }}
-        >
-          <button className="loginButton" onClick={onLogin}>
+        <button className="loginButton" onClick={onLogin}>
+          <Link to="/login" className="loginLink">
             로그인 / 가입
-          </button>
-        </Link>
+          </Link>
+        </button>
       )}
 
-      <Link to="/" className="homeLink">
-        <h1 className="homeTitle">BOX OFFICE</h1>
-      </Link>
+      <h1 className="homeTitle">
+        <Link to="/" className="homeLink">
+          BOX OFFICE
+        </Link>
+      </h1>
     </div>
   );
 }

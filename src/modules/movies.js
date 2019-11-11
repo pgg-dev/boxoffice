@@ -65,7 +65,6 @@ export const setLogout = () => async dispatch => {
 
 export const setMovies = date => async dispatch => {
   console.log("///////////setMovies///////////////");
-
   const {
     data: {
       boxOfficeResult: { dailyBoxOfficeList: rankingData }
@@ -139,6 +138,7 @@ export const setMovies = date => async dispatch => {
   };
 
   Promise.all([rankingData, getData()]).then(() => {
+    console.log("프로미스 확인");
     dispatch(getMovies(date));
   });
 };
@@ -146,11 +146,25 @@ export const setMovies = date => async dispatch => {
 export const getMovies = date => async dispatch => {
   console.log("modules/getMovies");
 
-  dispatch({ type: GET_MOVIES });
-
   if (date === "") {
     date = moment().format("YYYYMMDD") - 1;
   }
+
+  dispatch({ type: GET_MOVIES });
+
+  // console.log("///////////테스트중/////////////");
+  // firestore
+  //   .collection("movies")
+  //   .doc(date.toString())
+  //   .collection("movieList")
+  //   .orderBy("rank", "asc")
+  //   .onSnapshot(querySnapshot => {
+  //     console.log(querySnapshot);
+  //     querySnapshot.docChanges().forEach(change => {
+  //       console.log(change);
+  //     });
+  //   });
+  // console.log("///////////테스트중/////////////");
 
   firestore
     .collection("movies")
@@ -159,13 +173,17 @@ export const getMovies = date => async dispatch => {
     .orderBy("rank", "asc")
     .get()
     .then(snapshot => {
-      const rows = [];
-      snapshot.forEach(doc => {
-        const childData = doc.data();
-        rows.push(childData);
-      });
-      const payload = rows;
-      dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
+      if (snapshot.empty) {
+        dispatch(setMovies(date));
+      } else {
+        const rows = [];
+        snapshot.forEach(doc => {
+          const childData = doc.data();
+          rows.push(childData);
+        });
+        const payload = rows;
+        dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
+      }
     });
 };
 
