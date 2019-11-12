@@ -1,24 +1,27 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<!-- This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). -->
 
 # BOX OFFICE
 
 ## About
 
-특정 날짜를 검색하면 해당 일자의 박스오피스 정보를 제공합니다. 첫 페이지는 어제 일자 기준입니다.
+특정 날짜를 입력하여 검색하면 해당 일자의 박스오피스 정보를 제공합니다. 기본 페이지는 어제 일자 기준 정보입니다.
 
 ## Features
 
-- SNS 계정을 통한 회원가입 및 로그인
-- 날짜를 통한 박스오피스 검색
-- 영화 별 댓글 입력 및 삭제
+### MovieListPage
 
-## Detailed Function
+- 기준 일자의 박스오피스 정보 제공
+- 날짜를 이용하여 박스오피스 검색
+
+### MoviePage
+
+- 영화 별 상세 정보 제공
+- 댓글 입력 및 삭제
 
 ### LoginPage
 
-### MovieListPage
-
-### MoviePage
+- SNS 계정을 통한 회원가입 및 로그인
+- 회원가입 시 Firebase에 회원 정보 저장
 
 ## Following technologies are used
 
@@ -37,6 +40,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - firebase
 - moment
 - styled-components
+
+## Screenshots
 
 ## Available Scripts
 

@@ -3,10 +3,10 @@ import MovieContainer from "../containers/MovieContainer";
 
 function MoviePage({ match }) {
   console.log("pages/MoviePage");
-  const { rank } = match.params;
+  const { movieID } = match.params;
 
   console.log(match);
-  return <MovieContainer rank={parseInt(rank)} />;
+  return <MovieContainer movieID={movieID} />;
 }
 
 export default MoviePage;

@@ -23,10 +23,10 @@ function MovieList({ onChange, onClick, movies, date }) {
         {moment(date.toString()).format("YYYY년 M월 D일")} 기준
       </span> */}
       <div className="movies">
-        {movies.map(movie => (
-          <div className="movie" key={movie.rank}>
-            <h1 className="rank">{movie.rank}</h1>
-            <Link to={`/boxoffice/${movie.rank}`}>
+        {movies.map((movie, index) => (
+          <div className="movie" key={index}>
+            <h1 className="rank">{index + 1}</h1>
+            <Link to={`/${movie.id}`}>
               <img className="poster" src={movie.poster} alt={movie.title} />
             </Link>
             <span className="title">{movie.title}</span>

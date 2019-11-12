@@ -63,8 +63,89 @@ export const setLogout = () => async dispatch => {
   dispatch({ type: SET_LOGOUT });
 };
 
-export const setMovies = date => async dispatch => {
+//////////////////////////////////////////////////////////setMovies
+
+const setMovies = async rankingData => {
   console.log("///////////setMovies///////////////");
+  return new Promise(async resolve => {
+    await axios
+      .get(
+        "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
+        {
+          params: {
+            ServiceKey: "JIB0YUBGVC07GLD5WFBD",
+            collection: "kmdb_new",
+            title: rankingData.movieNm,
+            releaseDts: rankingData.openDt.replace(/-/gi, "")
+          }
+        }
+      )
+      .then(data => {
+        let items = data.data.Data[0];
+        if (items.hasOwnProperty("Result")) {
+          const detailData = items.Result[0];
+
+          console.log(detailData);
+          if (detailData.posters.includes("|"))
+            detailData.posters = detailData.posters.substring(
+              0,
+              detailData.posters.indexOf("|")
+            );
+
+          let docRef = firestore.collection("movies").doc(rankingData.movieCd);
+          docRef.set(
+            {
+              id: rankingData.movieCd,
+              title: rankingData.movieNm,
+              poster: detailData.posters,
+              openDt: moment(rankingData.openDt).format("YYYY년 M월 D일"),
+              grade: detailData.rating[0].ratingGrade,
+              genre: detailData.genre,
+              runtime: detailData.runtime,
+              director: detailData.director[0].directorNm,
+              actors: [
+                detailData.actor[0].actorNm,
+                detailData.actor[1].actorNm
+              ],
+              plot: detailData.plot
+            },
+            { merge: true }
+          );
+
+          resolve(rankingData);
+        } else {
+          return rankingData;
+        }
+      });
+  });
+};
+
+const getData = rankingData => {
+  return new Promise(resolve =>
+    firestore
+      .collection("movies")
+      .doc(rankingData.movieCd)
+      .get()
+      .then(async doc => {
+        if (!doc.exists) {
+          await setMovies(rankingData).then(data => resolve(getData(data)));
+        } else {
+          const childData = doc.data();
+          resolve(childData);
+        }
+      })
+  );
+};
+
+//////////////////////////////////////////////////////////getMovies
+export const getMovies = date => async dispatch => {
+  console.log("modules/getMovies");
+  dispatch({ type: GET_MOVIES });
+
+  if (date === "") {
+    date = moment().format("YYYYMMDD") - 1;
+  }
+
   const {
     data: {
       boxOfficeResult: { dailyBoxOfficeList: rankingData }
@@ -79,163 +160,60 @@ export const setMovies = date => async dispatch => {
     }
   );
 
-  const getData = async () => {
-    console.log(rankingData);
-    for (let i = 0; i < rankingData.length; i++) {
-      await axios
-        .get(
-          "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-          {
-            params: {
-              ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-              collection: "kmdb_new",
-              title: rankingData[i].movieNm,
-              releaseDts: rankingData[i].openDt.replace(/-/gi, "")
-            }
-          }
-        )
-        .then(data => {
-          let items = data.data.Data[0];
-          if (items.hasOwnProperty("Result")) {
-            const detailData = items.Result[0];
-
-            console.log(detailData);
-            if (detailData.posters.includes("|"))
-              detailData.posters = detailData.posters.substring(
-                0,
-                detailData.posters.indexOf("|")
-              );
-
-            let docRef = firestore
-              .collection("movies")
-              .doc(date.toString())
-              .collection("movieList")
-              .doc(rankingData[i].rank);
-
-            docRef.set(
-              {
-                rank: parseInt(rankingData[i].rank),
-                title: rankingData[i].movieNm,
-                poster: detailData.posters,
-                openDt: moment(rankingData[i].openDt).format("YYYY년 M월 D일"),
-                grade: detailData.rating[0].ratingGrade,
-                genre: detailData.genre,
-                runtime: detailData.runtime,
-                director: detailData.director[0].directorNm,
-                actors: [
-                  detailData.actor[0].actorNm,
-                  detailData.actor[1].actorNm
-                ],
-                plot: detailData.plot
-              },
-              { merge: true }
-            );
-          } else {
-            return rankingData[i];
-          }
-        });
-    }
-  };
-
-  Promise.all([rankingData, getData()]).then(() => {
-    console.log("프로미스 확인");
-    dispatch(getMovies(date));
-  });
-};
-
-export const getMovies = date => async dispatch => {
-  console.log("modules/getMovies");
-
-  if (date === "") {
-    date = moment().format("YYYYMMDD") - 1;
-  }
-
-  dispatch({ type: GET_MOVIES });
-
-  // console.log("///////////테스트중/////////////");
-  // firestore
-  //   .collection("movies")
-  //   .doc(date.toString())
-  //   .collection("movieList")
-  //   .orderBy("rank", "asc")
-  //   .onSnapshot(querySnapshot => {
-  //     console.log(querySnapshot);
-  //     querySnapshot.docChanges().forEach(change => {
-  //       console.log(change);
-  //     });
-  //   });
-  // console.log("///////////테스트중/////////////");
-
-  firestore
-    .collection("movies")
-    .doc(date.toString())
-    .collection("movieList")
-    .orderBy("rank", "asc")
-    .get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        dispatch(setMovies(date));
-      } else {
-        const rows = [];
-        snapshot.forEach(doc => {
-          const childData = doc.data();
-          rows.push(childData);
-        });
-        const payload = rows;
-        dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
-      }
+  let payload = [];
+  for (let i = 0; i < rankingData.length; i++) {
+    await getData(rankingData[i]).then(async data => {
+      payload.push(data);
     });
+  }
+  dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
 };
 
-export const getMovie = rank => async dispatch => {
+export const getMovie = movieID => async dispatch => {
   console.log("modules/getMovie");
+  console.log(movieID);
   dispatch({ type: GET_MOVIE });
   try {
-    dispatch({ type: GET_MOVIE_SUCCESS, rank });
+    dispatch({ type: GET_MOVIE_SUCCESS, movieID });
   } catch (e) {
     dispatch({ type: GET_MOVIE_ERROR, error: e });
   }
 };
 
-export const getComment = (date, rank) => async dispatch => {
+export const getComment = movieID => async dispatch => {
   console.log("getComment");
   try {
     firestore
       .collection("movies")
-      .doc(date.toString())
-      .collection("movieList")
-      .where("rank", "==", rank)
+      .doc(movieID)
       .get()
-      .then(snapshot => {
-        snapshot.forEach(doc => {
-          if (doc.data().comment !== undefined) {
-            const comment = doc.data().comment;
-            const payload = comment;
-            dispatch({ type: GET_COMMENT_SUCCESS, payload });
-          }
-        });
+      .then(doc => {
+        if (doc.data().comments !== undefined) {
+          const payload = [];
+          doc.data().comments.forEach(comment => {
+            payload.push(comment);
+          });
+          dispatch({ type: GET_COMMENT_SUCCESS, payload });
+        }
       });
   } catch (e) {
     dispatch({ type: GET_COMMENT_ERROR, error: e });
   }
 };
 
-export const addComment = (changComment, rank, date) => async dispatch => {
+export const addComment = (changComment, movieID) => async dispatch => {
+  console.log("addComment");
   try {
-    let docRef = firestore
-      .collection("movies")
-      .doc(date.toString())
-      .collection("movieList")
-      .doc(rank.toString());
+    let docRef = firestore.collection("movies").doc(movieID);
 
     docRef.set(
       {
-        comment: changComment
+        comments: changComment
       },
       { merge: true }
     );
 
-    dispatch(getComment(date, rank));
+    dispatch(getComment(movieID));
   } catch (e) {
     dispatch({ type: GET_COMMENT_ERROR, error: e });
   }
@@ -352,7 +330,7 @@ export default function movies(state = initialState, action) {
         ...state,
         movie: {
           loading: false,
-          data: state.movies.data.find(movie => movie.rank === action.rank),
+          data: state.movies.data.find(movie => movie.id === action.movieID),
           error: null
         },
         comment: []
@@ -374,7 +352,7 @@ export default function movies(state = initialState, action) {
     case GET_COMMENT_ERROR:
       return {
         ...state,
-        comment: null
+        comment: []
       };
     default:
       return state;

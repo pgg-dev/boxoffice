@@ -16,7 +16,7 @@ function App() {
         <Switch>
           <Route path="/" component={MovieListPage} exact />
           <Route path="/login" component={LoginPage} />
-          <Route path="/boxoffice/:rank" component={MoviePage} />
+          <Route path="/:movieID" component={MoviePage} />
         </Switch>
       </Container>
     </React.Fragment>

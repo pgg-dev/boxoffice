@@ -3,18 +3,17 @@ import { useSelector, useDispatch } from "react-redux";
 import Movie from "../components/Movie";
 import { getMovie, addComment, getComment } from "../modules/movies";
 
-function MovieContainer({ rank }) {
+function MovieContainer({ movieID }) {
   const { date } = useSelector(state => state.movies.movies);
   const { data, loading, error } = useSelector(state => state.movies.movie);
   const { status, id } = useSelector(state => state.movies.login);
   const { comment } = useSelector(state => state.movies);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getMovie(rank));
-    dispatch(getComment(date, rank));
-  }, [dispatch, date, rank]);
+    dispatch(getMovie(movieID));
+    dispatch(getComment(movieID));
+  }, [dispatch, movieID]);
 
   let text = null;
   let changComment = [];
@@ -30,7 +29,7 @@ function MovieContainer({ rank }) {
     } else {
       changComment = comment;
       changComment.push({ text: text, writer: id });
-      dispatch(addComment(changComment, rank, date, id));
+      dispatch(addComment(changComment, movieID));
     }
   };
 
