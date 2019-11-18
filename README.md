@@ -23,7 +23,7 @@
 - SNS 계정을 통한 회원가입 및 로그인
 - 회원가입 시 Firebase에 회원 정보 저장
 
-## Following technologies are used
+## Project Stack
 
 - react
 - react-dom
