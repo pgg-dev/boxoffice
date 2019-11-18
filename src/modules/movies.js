@@ -180,12 +180,12 @@ export const getMovie = movieID => async dispatch => {
   }
 };
 
-export const getComment = movieID => async dispatch => {
+export const getComment = movieId => async dispatch => {
   console.log("getComment");
   try {
     firestore
       .collection("movies")
-      .doc(movieID)
+      .doc(movieId)
       .get()
       .then(doc => {
         if (doc.data().comments !== undefined) {
@@ -201,10 +201,10 @@ export const getComment = movieID => async dispatch => {
   }
 };
 
-export const addComment = (changComment, movieID) => async dispatch => {
+export const addComment = (changComment, movieId) => async dispatch => {
   console.log("addComment");
   try {
-    let docRef = firestore.collection("movies").doc(movieID);
+    let docRef = firestore.collection("movies").doc(movieId);
 
     docRef.set(
       {
@@ -213,7 +213,25 @@ export const addComment = (changComment, movieID) => async dispatch => {
       { merge: true }
     );
 
-    dispatch(getComment(movieID));
+    dispatch(getComment(movieId));
+  } catch (e) {
+    dispatch({ type: GET_COMMENT_ERROR, error: e });
+  }
+};
+
+export const deleteCommend = (movieId, id) => async dispatch => {
+  try {
+    firestore
+      .collection("movies")
+      .doc(movieId)
+      .get()
+      .then(doc => {
+        const comments = doc.data().comments;
+        for (let i = 0; i < comments.length; i++) {
+          if (comments[i].id === id) {
+          }
+        }
+      });
   } catch (e) {
     dispatch({ type: GET_COMMENT_ERROR, error: e });
   }

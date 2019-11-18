@@ -4,7 +4,6 @@ import Movie from "../components/Movie";
 import { getMovie, addComment, getComment } from "../modules/movies";
 
 function MovieContainer({ movieID }) {
-  const { date } = useSelector(state => state.movies.movies);
   const { data, loading, error } = useSelector(state => state.movies.movie);
   const { status, id } = useSelector(state => state.movies.login);
   const { comment } = useSelector(state => state.movies);
@@ -32,6 +31,8 @@ function MovieContainer({ movieID }) {
       dispatch(addComment(changComment, movieID));
     }
   };
+
+  const handDelete = e => {};
 
   if (loading && !data) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;

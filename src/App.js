@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, HashRouter } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import MoviePage from "./pages/MoviePage";
 import MovieListPage from "./pages/MovieListPage";
 import LoginPage from "./pages/LoginPage";
@@ -25,10 +25,12 @@ function App() {
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: #eff3f7
+    background-color: #eff3f7;
+   
   }
     `;
 const Container = styled.div`
+  display: flex;
   flex-direction: column;
   box-sizing: border-box;
   padding: 30px;

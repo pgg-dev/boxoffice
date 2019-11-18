@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-function Movie({ movie, isLogin, comment, onChange, onClick }) {
+function Movie({ movie, isLogin, comment, onChange, onClick, onDelete }) {
   console.log("components/Movie");
 
   return (
@@ -37,11 +37,13 @@ function Movie({ movie, isLogin, comment, onChange, onClick }) {
           />
           <CommnetButton onClick={onClick}>입력</CommnetButton>
         </CommentBox>
+        
 
         <CommentList>
           {comment.map((content, index) => (
             <CommentItem key={index}>
               <p> {content.text}</p>
+              <CommentDelete onClick={onDelete}>삭제</CommentDelete>
             </CommentItem>
           ))}
         </CommentList>
@@ -130,6 +132,10 @@ const CommentItem = styled.li`
     border-bottom: 1px solid #d9d9d9;
   }
   padding: 20px 0 20px 20px;
+`;
+
+const CommentDelete = styled.button`
+
 `;
 
 export default Movie;

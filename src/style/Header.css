@@ -18,9 +18,10 @@
 }
 
 .loginButton {
+  position: relative;
+  right: -100%;
   padding: 7px;
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
   font-size: 17px;
   font-family: "Nanum Gothic", sans-serif;
   font-weight: 800;
@@ -30,8 +31,6 @@
 }
 
 .loginLink {
-  box-sizing: border-box;
-  justify-content: flex-end;
   text-decoration: none;
   color: white;
 }

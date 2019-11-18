@@ -6,7 +6,9 @@ import MovieList from "../components/MovieList";
 function MovieListContainer() {
   console.log("MovieListContainer");
 
-  const { data, loading, error } = useSelector(state => state.movies.movies);
+  const { data, loading, error, date } = useSelector(
+    state => state.movies.movies
+  );
   const dispatch = useDispatch();
 
   let changeDate = "";
@@ -37,7 +39,7 @@ function MovieListContainer() {
       onChange={handleChange}
       onClick={handleClick}
       movies={data}
-      // date={date}
+      date={date}
     />
   );
 }

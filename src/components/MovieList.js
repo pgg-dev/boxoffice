@@ -19,9 +19,10 @@ function MovieList({ onChange, onClick, movies, date }) {
           <MdSearch />
         </button>
       </div>
-      {/* <span className="dateInfo">
-        {moment(date.toString()).format("YYYY년 M월 D일")} 기준
-      </span> */}
+      <span className="dateInfo">
+        {moment(date.toString()).format("YYYY년 M월 D일")}
+        기준
+      </span>
       <div className="movies">
         {movies.map((movie, index) => (
           <div className="movie" key={index}>
