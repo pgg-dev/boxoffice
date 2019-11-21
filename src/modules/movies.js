@@ -214,7 +214,7 @@ export const addComment = (changComment, movieId) => async dispatch => {
   }
 };
 
-export const deleteCommend = (movieId, id) => async dispatch => {
+export const deleteComment = (movieId, id) => async dispatch => {
   try {
     let docRef = firestore.collection("movies").doc(movieId);
     docRef.get().then(doc => {

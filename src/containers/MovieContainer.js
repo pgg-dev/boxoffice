@@ -5,7 +5,7 @@ import {
   getMovie,
   addComment,
   getComment,
-  deleteCommend
+  deleteComment
 } from "../modules/movies";
 
 function MovieContainer({ movieId }) {
@@ -45,7 +45,7 @@ function MovieContainer({ movieId }) {
 
   const handleDelete = e => {
     console.log("handDelete");
-    dispatch(deleteCommend(movieId, id));
+    dispatch(deleteComment(movieId, id));
   };
 
   if (loading && !data) return <div>로딩중...</div>;
