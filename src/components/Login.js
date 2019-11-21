@@ -4,6 +4,37 @@ import KakaoLogin from "react-kakao-login";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
+function Login({ responseGoogle, responseKakao, responseFail }) {
+  return (
+    <Container>
+      <HomeLink to="/">
+        <HomeTitle>BOX OFFICE</HomeTitle>
+      </HomeLink>
+
+      <GoogleLogin
+        clientId="822311017221-vqnjoe6mjbljr9cp1dvoeahjil2mhh9v.apps.googleusercontent.com"
+        render={renderProps => (
+          <GoogleButton
+            onClick={renderProps.onClick}
+            disabled={renderProps.disabled}
+          >
+            구글로 시작
+          </GoogleButton>
+        )}
+        onSuccess={responseGoogle}
+        onFailure={responseFail}
+      />
+
+      <KakaoButton
+        jsKey="09cacdaaabf08e5b95d7d9c603f1361b"
+        buttonText="카카오로 시작"
+        onSuccess={responseKakao}
+        onFailure={responseFail}
+      />
+    </Container>
+  );
+}
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -11,6 +42,17 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const HomeTitle = styled.span`
+  font-size: 65px;
+  font-family: "Viga", sans-serif;
+  letter-spacing: 5px;
+  margin: 30px;
+`;
+
+const HomeLink = styled(Link)`
+  text-decoration: none;
+  color: #03cf5d;
+`;
 const KakaoButton = styled(KakaoLogin)`
   padding: 0;
   margin: 10px;
@@ -38,38 +80,5 @@ const GoogleButton = styled.button`
   font-size: 16px;
   cursor: pointer;
 `;
-
-function Login({ responseGoogle, responseKakao, responseFail }) {
-  console.log("components/Login");
-
-  return (
-    <Container>
-      <Link to="/" className="homeLink">
-        <span className="homeTitle">BOX OFFICE</span>
-      </Link>
-
-      <GoogleLogin
-        clientId="822311017221-vqnjoe6mjbljr9cp1dvoeahjil2mhh9v.apps.googleusercontent.com"
-        render={renderProps => (
-          <GoogleButton
-            onClick={renderProps.onClick}
-            disabled={renderProps.disabled}
-          >
-            구글로 시작
-          </GoogleButton>
-        )}
-        onSuccess={responseGoogle}
-        onFailure={responseFail}
-      />
-
-      <KakaoButton
-        jsKey="09cacdaaabf08e5b95d7d9c603f1361b"
-        buttonText="카카오로 시작"
-        onSuccess={responseKakao}
-        onFailure={responseFail}
-      />
-    </Container>
-  );
-}
 
 export default Login;

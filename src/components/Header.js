@@ -1,34 +1,58 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../style/Header.css";
+import styled from "styled-components";
 
 function Header({ loginStatus, onLogin, onLogout }) {
-  console.log("components/Header");
-  // console.log("////////////////////////////////");
-  // console.log(window.location.pathname);
   return (
-    <div className="header">
+    <HeaderContainer>
       {loginStatus ? (
-        <button className="loginButton" onClick={onLogout}>
-          <Link to="/" className="loginLink">
-            로그아웃
-          </Link>
-        </button>
+        <LoginButton onClick={onLogout}>
+          <LoginLink to="/">로그아웃</LoginLink>
+        </LoginButton>
       ) : (
-        <button className="loginButton" onClick={onLogin}>
-          <Link to="/login" className="loginLink">
-            로그인 / 가입
-          </Link>
-        </button>
+        <LoginButton onClick={onLogin}>
+          <LoginLink to="/login">로그인 / 가입</LoginLink>
+        </LoginButton>
       )}
-
-      <h1 className="homeTitle">
-        <Link to="/" className="homeLink">
-          BOX OFFICE
-        </Link>
-      </h1>
-    </div>
+      <HomeTitle>
+        <HomeLink to="/">BOX OFFICE</HomeLink>
+      </HomeTitle>
+    </HeaderContainer>
   );
 }
+
+const HeaderContainer = styled.div`
+  text-align: center;
+`;
+
+const LoginButton = styled.button`
+  position: relative;
+  right: -100%;
+  padding: 7px;
+  box-sizing: border-box;
+  font-size: 17px;
+  font-family: "Nanum Gothic", sans-serif;
+  font-weight: 800;
+  background: #03cf5d;
+  border: 3px solid #03cf5d;
+  border-radius: 20px;
+`;
+
+const LoginLink = styled(Link)`
+  text-decoration: none;
+  color: white;
+`;
+
+const HomeTitle = styled.h1`
+  font-size: 65px;
+  font-family: "Viga", sans-serif;
+  letter-spacing: 5px;
+  margin: 30px;
+`;
+
+const HomeLink = styled(Link)`
+  text-decoration: none;
+  color: #03cf5d;
+`;
 
 export default Header;
