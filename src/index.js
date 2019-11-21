@@ -25,7 +25,6 @@ const store = createStore(
 );
 //Thunk내부에서 history를 사용할 수 있다.
 
-console.log("index2");
 ReactDOM.render(
   <Router history={customHistory}>
     <Provider store={store}>

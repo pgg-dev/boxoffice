@@ -1,18 +1,23 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Movie from "../components/Movie";
-import { getMovie, addComment, getComment } from "../modules/movies";
+import {
+  getMovie,
+  addComment,
+  getComment,
+  deleteCommend
+} from "../modules/movies";
 
-function MovieContainer({ movieID }) {
+function MovieContainer({ movieId }) {
   const { data, loading, error } = useSelector(state => state.movies.movie);
   const { status, id } = useSelector(state => state.movies.login);
-  const { comment } = useSelector(state => state.movies);
+  const { comments } = useSelector(state => state.movies);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getMovie(movieID));
-    dispatch(getComment(movieID));
-  }, [dispatch, movieID]);
+    dispatch(getMovie(movieId));
+    dispatch(getComment(movieId));
+  }, [dispatch, movieId]);
 
   let text = null;
   let changComment = [];
@@ -23,16 +28,25 @@ function MovieContainer({ movieID }) {
 
   const handleClick = e => {
     console.log("handleClick");
+    changComment = comments;
     if (!status) {
       alert("로그인 해주세요.");
+    } else if (changComment.length) {
+      changComment.forEach(item => {
+        if (item.writer === id) {
+          alert("이미 작성한 리뷰가 존재합니다.");
+        }
+      });
     } else {
-      changComment = comment;
       changComment.push({ text: text, writer: id });
-      dispatch(addComment(changComment, movieID));
+      dispatch(addComment(changComment, movieId));
     }
   };
 
-  const handDelete = e => {};
+  const handleDelete = e => {
+    console.log("handDelete");
+    dispatch(deleteCommend(movieId, id));
+  };
 
   if (loading && !data) return <div>로딩중...</div>;
   if (error) return <div>에러 발생</div>;
@@ -43,9 +57,10 @@ function MovieContainer({ movieID }) {
       movie={data}
       isLogin={status}
       writer={id}
-      comment={comment}
+      comments={comments}
       onChange={handleChange}
       onClick={handleClick}
+      onDelete={handleDelete}
     />
   );
 }

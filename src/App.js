@@ -16,7 +16,7 @@ function App() {
         <Switch>
           <Route path="/" component={MovieListPage} exact />
           <Route path="/login" component={LoginPage} />
-          <Route path="/:movieID" component={MoviePage} />
+          <Route path="/:movieId" component={MoviePage} />
         </Switch>
       </Container>
     </React.Fragment>
@@ -26,8 +26,7 @@ function App() {
 const GlobalStyle = createGlobalStyle`
   body {
     background-color: #eff3f7;
-   
-  }
+    }
     `;
 const Container = styled.div`
   display: flex;

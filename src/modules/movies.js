@@ -63,8 +63,6 @@ export const setLogout = () => async dispatch => {
   dispatch({ type: SET_LOGOUT });
 };
 
-//////////////////////////////////////////////////////////setMovies
-
 const setMovies = async rankingData => {
   console.log("///////////setMovies///////////////");
   return new Promise(async resolve => {
@@ -137,7 +135,6 @@ const getData = rankingData => {
   );
 };
 
-//////////////////////////////////////////////////////////getMovies
 export const getMovies = date => async dispatch => {
   console.log("modules/getMovies");
   dispatch({ type: GET_MOVIES });
@@ -169,12 +166,12 @@ export const getMovies = date => async dispatch => {
   dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
 };
 
-export const getMovie = movieID => async dispatch => {
+export const getMovie = movieId => async dispatch => {
   console.log("modules/getMovie");
-  console.log(movieID);
+  console.log(movieId);
   dispatch({ type: GET_MOVIE });
   try {
-    dispatch({ type: GET_MOVIE_SUCCESS, movieID });
+    dispatch({ type: GET_MOVIE_SUCCESS, movieId });
   } catch (e) {
     dispatch({ type: GET_MOVIE_ERROR, error: e });
   }
@@ -205,14 +202,12 @@ export const addComment = (changComment, movieId) => async dispatch => {
   console.log("addComment");
   try {
     let docRef = firestore.collection("movies").doc(movieId);
-
     docRef.set(
       {
         comments: changComment
       },
       { merge: true }
     );
-
     dispatch(getComment(movieId));
   } catch (e) {
     dispatch({ type: GET_COMMENT_ERROR, error: e });
@@ -221,17 +216,19 @@ export const addComment = (changComment, movieId) => async dispatch => {
 
 export const deleteCommend = (movieId, id) => async dispatch => {
   try {
-    firestore
-      .collection("movies")
-      .doc(movieId)
-      .get()
-      .then(doc => {
-        const comments = doc.data().comments;
-        for (let i = 0; i < comments.length; i++) {
-          if (comments[i].id === id) {
-          }
+    let docRef = firestore.collection("movies").doc(movieId);
+    docRef.get().then(doc => {
+      const comments = doc.data().comments;
+      for (let i = 0; i < comments.length; i++) {
+        if (comments[i].writer === id) {
+          docRef
+            .update({
+              comments: comments.filter(comment => comment.writer !== id)
+            })
+            .then(dispatch(getComment(movieId)));
         }
-      });
+      }
+    });
   } catch (e) {
     dispatch({ type: GET_COMMENT_ERROR, error: e });
   }
@@ -255,7 +252,8 @@ const initialState = {
     data: null,
     error: null
   },
-  comment: []
+
+  comments: []
 };
 
 export default function movies(state = initialState, action) {
@@ -348,10 +346,9 @@ export default function movies(state = initialState, action) {
         ...state,
         movie: {
           loading: false,
-          data: state.movies.data.find(movie => movie.id === action.movieID),
+          data: state.movies.data.find(movie => movie.id === action.movieId),
           error: null
-        },
-        comment: []
+        }
       };
     case GET_MOVIE_ERROR:
       return {
@@ -365,12 +362,12 @@ export default function movies(state = initialState, action) {
     case GET_COMMENT_SUCCESS:
       return {
         ...state,
-        comment: action.payload
+        comments: action.payload
       };
     case GET_COMMENT_ERROR:
       return {
         ...state,
-        comment: []
+        comments: []
       };
     default:
       return state;
