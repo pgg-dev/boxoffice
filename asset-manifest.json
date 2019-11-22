@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/boxoffice/static/css/main.8232a0b5.chunk.css",
-    "main.js": "/boxoffice/static/js/main.27561614.chunk.js",
-    "main.js.map": "/boxoffice/static/js/main.27561614.chunk.js.map",
+    "main.css": "/boxoffice/static/css/main.8b1156fb.chunk.css",
+    "main.js": "/boxoffice/static/js/main.35fe614f.chunk.js",
+    "main.js.map": "/boxoffice/static/js/main.35fe614f.chunk.js.map",
     "runtime-main.js": "/boxoffice/static/js/runtime-main.0652679e.js",
     "runtime-main.js.map": "/boxoffice/static/js/runtime-main.0652679e.js.map",
-    "static/js/2.3b5efdc6.chunk.js": "/boxoffice/static/js/2.3b5efdc6.chunk.js",
-    "static/js/2.3b5efdc6.chunk.js.map": "/boxoffice/static/js/2.3b5efdc6.chunk.js.map",
+    "static/js/2.6e4a4861.chunk.js": "/boxoffice/static/js/2.6e4a4861.chunk.js",
+    "static/js/2.6e4a4861.chunk.js.map": "/boxoffice/static/js/2.6e4a4861.chunk.js.map",
     "index.html": "/boxoffice/index.html",
-    "precache-manifest.22af1efa00c040a110d90c348c409b0e.js": "/boxoffice/precache-manifest.22af1efa00c040a110d90c348c409b0e.js",
+    "precache-manifest.e275431974854cf93e4d56f9acb52369.js": "/boxoffice/precache-manifest.e275431974854cf93e4d56f9acb52369.js",
     "service-worker.js": "/boxoffice/service-worker.js",
-    "static/css/main.8232a0b5.chunk.css.map": "/boxoffice/static/css/main.8232a0b5.chunk.css.map"
+    "static/css/main.8b1156fb.chunk.css.map": "/boxoffice/static/css/main.8b1156fb.chunk.css.map"
   },
   "entrypoints": [
     "static/js/runtime-main.0652679e.js",
-    "static/js/2.3b5efdc6.chunk.js",
-    "static/css/main.8232a0b5.chunk.css",
-    "static/js/main.27561614.chunk.js"
+    "static/js/2.6e4a4861.chunk.js",
+    "static/css/main.8b1156fb.chunk.css",
+    "static/js/main.35fe614f.chunk.js"
   ]
 }
