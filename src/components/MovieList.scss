@@ -1,0 +1,175 @@
+* {
+  box-sizing: border-box;
+}
+.movieListContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Nanum Gothic", sans-serif;
+}
+
+@mixin icon {
+  background: url("../images/ico_movie.png") 0 0 no-repeat;
+}
+
+@mixin btn-color($color) {
+  color: $color;
+  border: 1px solid $color;
+  font-weight: bold;
+}
+.date_area {
+  height: 100px;
+  width: 100%;
+  //   border: 3px solid orange;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+
+  & .date_box {
+    // border: 5px solid;
+    width: 800px;
+    height: 45px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 15px;
+
+    & ul {
+      //   border: 3px solid red;
+      text-align: center;
+      height: 100%;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      padding: 0;
+
+      & li {
+        color: #495057;
+        border: 1px solid #ced4da;
+        width: 150px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: -1px;
+        letter-spacing: 2px;
+        cursor: pointer;
+
+        &.daily {
+          margin-right: 1px;
+          @include btn-color(#ff382e);
+        }
+
+        &.weekly {
+          @include btn-color(#ff382e);
+        }
+
+        &:hover {
+          color: #ff382e;
+        }
+      }
+
+      // &:first_child {
+      //   border: 1px solid #ff382e;
+      //   color: #ff382e;
+      // }
+    }
+  }
+
+  & .date_calendar {
+    width: 470px;
+    // border: 2px solid gray;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    & button {
+      @include icon;
+      outline: none;
+      border: 0;
+      width: 8px;
+      height: 13px;
+      cursor: pointer;
+    }
+    & span {
+      margin: 15px;
+    }
+
+    & .btn-prev {
+      background-position: -188px 0;
+    }
+    & .btn-next {
+      background-position: -218px 0;
+      cursor: none;
+
+      &.next {
+        background-position: -198px 0;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.movieList {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-family: "Nanum Gothic", sans-serif;
+}
+
+.movie {
+  /* display: flex;
+  flex-direction: column; */
+  box-sizing: border-box;
+  width: 250px;
+  /* margin: 0px 3% 20px; */
+}
+
+.rank {
+  box-sizing: border-box;
+  position: relative;
+  top: 47px;
+  left: 10px;
+  margin: 0;
+  padding: 0;
+  width: 44px;
+  height: 40px;
+  color: white;
+  opacity: 0.8;
+  text-shadow: #212529 2px 2px 2px;
+}
+
+.poster {
+  border: 1px solid #d9d9d9;
+  height: 300px;
+}
+
+.movieInfo {
+  display: flex;
+}
+
+.movieTitle {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.grade {
+  width: 34px;
+  height: 20px;
+  margin-left: 5px;
+  text-indent: -9999px;
+  @include icon;
+
+  &[grade="전체관람가"] {
+    background-position: -230px -110px;
+  }
+  &[grade="12세관람가"] {
+    background-position: -230px -30px;
+  }
+  &[grade="15세관람가"] {
+    background-position: -230px -50px;
+  }
+  background-position: -230px -70px;
+}

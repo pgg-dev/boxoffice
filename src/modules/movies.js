@@ -48,9 +48,6 @@ export const setLogin = (provider, id) => async dispatch => {
             { merge: true }
           );
         }
-        // snapshot .forEach(doc  => {
-        //   console.log(doc.id, "=>", doc .data());
-        // });
       });
     dispatch({ type: SET_LOGIN_SUCCESS, id, provider });
   } catch (e) {
@@ -59,12 +56,10 @@ export const setLogin = (provider, id) => async dispatch => {
 };
 
 export const setLogout = () => async dispatch => {
-  console.log("modules/setLogout");
   dispatch({ type: SET_LOGOUT });
 };
 
-const setMovies = async rankingData => {
-  console.log("///////////setMovies///////////////");
+const setMovies = rankingData => {
   return new Promise(async resolve => {
     await axios
       .get(
@@ -88,6 +83,12 @@ const setMovies = async rankingData => {
             detailData.posters = detailData.posters.substring(
               0,
               detailData.posters.indexOf("|")
+            );
+
+          if (detailData.rating[0].ratingGrade.includes("|"))
+            detailData.rating[0].ratingGrade = detailData.rating[0].ratingGrade.substring(
+              0,
+              detailData.rating[0].ratingGrade.indexOf("|")
             );
 
           let docRef = firestore.collection("movies").doc(rankingData.movieCd);
@@ -135,40 +136,64 @@ const getData = rankingData => {
   );
 };
 
-export const getMovies = date => async dispatch => {
-  console.log("modules/getMovies");
+export const getMovies = (date, period, next) => async dispatch => {
+  const key = "8512edd89b714bf2cf35fcb50adac48d";
+  let rankingData;
+  let dailyData = [];
+  let weeklyData = [];
+  let showRange;
   dispatch({ type: GET_MOVIES });
 
-  if (date === "") {
+  if (date === "" || !date) {
     date = moment().format("YYYYMMDD") - 1;
   }
 
-  const {
-    data: {
-      boxOfficeResult: { dailyBoxOfficeList: rankingData }
-    }
-  } = await axios.get(
-    "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-    {
-      params: {
-        key: "8512edd89b714bf2cf35fcb50adac48d",
-        targetDt: date
+  const getRankingData = async api => {
+    const {
+      data: { boxOfficeResult }
+    } = await axios.get(
+      `http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/${api}.json`,
+      {
+        params: {
+          key,
+          targetDt: date,
+          weekGb: 0
+        }
       }
-    }
-  );
+    );
 
-  let payload = [];
+    showRange = boxOfficeResult.showRange.split("~");
+    return boxOfficeResult;
+  };
+
+  if (period === "daily") {
+    await getRankingData("searchDailyBoxOfficeList").then(
+      data => (rankingData = data.dailyBoxOfficeList)
+    );
+  } else {
+    await getRankingData("searchWeeklyBoxOfficeList").then(
+      data => (rankingData = data.weeklyBoxOfficeList)
+    );
+  }
+
   for (let i = 0; i < rankingData.length; i++) {
     await getData(rankingData[i]).then(async data => {
-      payload.push(data);
+      period === "daily" ? dailyData.push(data) : weeklyData.push(data);
     });
   }
-  dispatch({ type: GET_MOVIES_SUCCESS, payload, date });
+  dispatch({
+    type: GET_MOVIES_SUCCESS,
+    date,
+    period,
+    showRange,
+    dailyData,
+    weeklyData,
+    next
+  });
 };
 
 export const getMovie = movieId => async dispatch => {
   console.log("modules/getMovie");
-  console.log(movieId);
   dispatch({ type: GET_MOVIE });
   try {
     dispatch({ type: GET_MOVIE_SUCCESS, movieId });
@@ -243,9 +268,13 @@ const initialState = {
   },
   movies: {
     loading: false,
-    data: null,
+    dailyData: null,
+    weeklyData: null,
     error: null,
-    date: null
+    date: null,
+    showRange: null,
+    period: null,
+    next: false
   },
   movie: {
     loading: false,
@@ -305,9 +334,13 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: true,
-          data: null,
+          dailyData: null,
+          weeklyData: null,
           error: null,
-          date: action.date
+          date: action.date,
+          period: action.period,
+          showRange: action.showRange,
+          next: false
         }
       };
     case GET_MOVIES_SUCCESS:
@@ -316,9 +349,13 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: false,
-          data: action.payload,
+          dailyData: action.dailyData,
+          weeklyData: action.weeklyData,
           error: null,
-          date: action.date
+          date: action.date,
+          period: action.period,
+          showRange: action.showRange,
+          next: action.next
         }
       };
     case GET_MOVIES_ERROR:
@@ -327,9 +364,11 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: false,
-          data: null,
+          dailyData: null,
+          weeklyData: null,
           error: action.error,
-          date: action.date
+          date: action.date,
+          period: null
         }
       };
     case GET_MOVIE:
@@ -346,7 +385,14 @@ export default function movies(state = initialState, action) {
         ...state,
         movie: {
           loading: false,
-          data: state.movies.data.find(movie => movie.id === action.movieId),
+          data:
+            state.movies.period === "daily"
+              ? state.movies.dailyData.find(
+                  movie => movie.id === action.movieId
+                )
+              : state.movies.weeklyData.find(
+                  movie => movie.id === action.movieId
+                ),
           error: null
         }
       };

@@ -2,10 +2,13 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
 import { setLogout, setLogin } from "../modules/movies";
+import { getMovies } from "../modules/movies";
+import moment from "moment";
 
 function HeaderContainer() {
   console.log("/containers/HeaderContainer");
   const { visible } = useSelector(state => state.movies);
+  const { period, next } = useSelector(state => state.movies.movies);
   const { status, provider, id } = useSelector(state => state.movies.login);
   const dispatch = useDispatch();
 
@@ -76,7 +79,46 @@ function HeaderContainer() {
   // dispatch(setLogout());
   // window.sessionStorage.clear();
 
-  return <Header loginStatus={status} onLogout={onLogout} />;
+  let changeDate = "";
+  const handleChange = e => {
+    changeDate = e.target.value;
+  };
+
+  const handleClick = e => {
+    dateCheck();
+  };
+
+  const dateCheck = () => {
+    const fixedDate = moment().format("YYYYMMDD") - 1;
+    if (period === "daily") {
+      if (fixedDate < changeDate) {
+        alert("검색 할 수 없습니다.");
+      } else {
+        if (fixedDate === changeDate) {
+          dispatch(getMovies(changeDate, period, false));
+        } else {
+          dispatch(getMovies(changeDate, period, true));
+        }
+      }
+    } else {
+      const monday = moment().startOf("isoWeek");
+      if (monday >= changeDate) {
+        console.log("///////////");
+        console.log(monday);
+        alert("검색 할 수 없습니다.");
+      } else {
+        dispatch(getMovies(changeDate, "weekly", true));
+      }
+    }
+  };
+  return (
+    <Header
+      loginStatus={status}
+      onLogout={onLogout}
+      onClick={handleClick}
+      onChange={handleChange}
+    />
+  );
 }
 
 export default HeaderContainer;

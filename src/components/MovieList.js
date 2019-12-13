@@ -1,112 +1,86 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { MdSearch } from "react-icons/md";
+// import { MdSearch } from "react-icons/md";
 import moment from "moment";
+import "./MovieList.scss";
+import classNames from "classnames";
+import load from "../images/load.gif";
 
-function MovieList({ onChange, onClick, movies, date }) {
+function MovieList({
+  loading,
+  onClick,
+  movies,
+  date,
+  period,
+  showRange,
+  onPrev,
+  onNext,
+  next
+}) {
   return (
-    <MovieListContainer>
-      <Search>
-        <SearchData placeholder="yyyymmdd" onChange={onChange} />
-        <SearchButton onClick={onClick}>
-          <MdSearch />
-        </SearchButton>
-      </Search>
-      <DateInfo>
-        {moment(date.toString()).format("YYYY년 M월 D일")}
-        기준
-      </DateInfo>
-      <Movies>
-        {movies.map((movie, index) => (
-          <Movie key={index}>
-            <Rank>{index + 1}</Rank>
+    <div className="movieListContainer">
+      <div className="date_area">
+        <div className="date_box">
+          <ul>
+            <li
+              className={period === "daily" ? "daily" : null}
+              onClick={onClick}
+            >
+              일간
+            </li>
+            <li
+              className={period === "weekly" ? "weekly" : null}
+              onClick={onClick}
+            >
+              주간
+            </li>
+          </ul>
+        </div>
+        <div className="date_calendar">
+          <button className="btn-prev" onClick={onPrev}></button>
+          <span>
+            {period === "daily"
+              ? moment(date.toString()).format("YYYY.MM.DD")
+              : moment(showRange[0]).format("YYYY.MM.DD") +
+                " ~ " +
+                moment(showRange[1]).format("YYYY.MM.DD")}
+          </span>
+          <button
+            className={classNames("btn-next", { next })}
+            onClick={onNext}
+            disabled={!next}
+          ></button>
+        </div>
+      </div>
+      <ul className="movieList">
+        {// loading ? (
+        // <div>
+        //   <img src={load} alt="Loading..." />
+        // </div>
+        // ) :
+
+        movies.map((movie, index) => (
+          <li className="movie" key={index}>
+            <h1 className="rank">{index + 1}</h1>
             <Link to={`/${movie.id}`}>
-              <Poster src={movie.poster} alt={movie.title} />
+              <img className="poster" src={movie.poster} alt={movie.title} />
             </Link>
-            <MovieTitle>{movie.title}</MovieTitle>
-          </Movie>
+            <div className="movieInfo">
+              <span className="movieTitle">
+                {movie.title.length > 14
+                  ? `${movie.title.substring(0, 14)}...`
+                  : movie.title}
+              </span>
+              <span className="grade" grade={movie.grade}>
+                {movie.grade}
+              </span>
+            </div>
+          </li>
         ))}
-      </Movies>
-    </MovieListContainer>
+      </ul>
+    </div>
   );
 }
-
-const MovieListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: "Nanum Gothic", sans-serif;
-`;
-const Search = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  width: 470px;
-  height: 45px;
-  border: 2px solid #03cf5d;
-  background: white;
-  margin-bottom: 80px;
-`;
-const SearchData = styled.input`
-  flex: 1;
-  margin-left: 10px;
-  border: 0;
-  outline: none;
-  font-size: 18px;
-  font-weight: bold;
-`;
-const SearchButton = styled.button`
-  display: flex;
-  justify-content: center;
-  width: 50px;
-  outline: none;
-  border: 0;
-  background: #03cf5d;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  font-size: 30px;
-`;
-const DateInfo = styled.span`
-  padding-left: 7%;
-  font-size: 18px;
-  align-self: flex-start;
-`;
-const Movies = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  font-family: "Nanum Gothic", sans-serif;
-`;
-const Movie = styled.div`
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 250px;
-  margin: 0px 3% 20px;
-`;
-const Rank = styled.h1`
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  width: 44px;
-  height: 40px;
-  background: #03cf5d;
-  color: white;
-  opacity: 0.8;
-  position: relative;
-  top: 22px;
-  left: -20px;
-`;
-const Poster = styled.img`
-  border: 1px solid #d9d9d9;
-  height: 300px;
-`;
-const MovieTitle = styled.span`
-  margin-top: 0;
-  font-size: 25px;
-  font-weight: bold;
-`;
 
 export default MovieList;

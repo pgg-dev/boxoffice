@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css?family=Viga&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800&display=swap");
+* {
+  box-sizing: border-box;
+}
+
+.headerContainer {
+  height: 150px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  width: 210px;
+  font-size: 33px;
+  font-family: "Viga", sans-serif;
+  letter-spacing: 2px;
+}
+
+.HomeLink {
+  text-decoration: none;
+  color: #03cf5d;
+}
+
+.box {
+  display: flex;
+  width: 640px;
+  justify-content: flex-end;
+}
+.search {
+  box-sizing: border-box;
+  display: flex;
+  width: 400px;
+  height: 45px;
+  border: 2px solid #03cf5d;
+  background: white;
+}
+
+.searchData {
+  flex: 1;
+  margin-left: 10px;
+  border: 0;
+  outline: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.searchButton {
+  display: flex;
+  justify-content: center;
+  width: 50px;
+  outline: none;
+  border: 0;
+  background: #03cf5d;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.loginButton {
+  padding: 7px;
+  box-sizing: border-box;
+  font-size: 17px;
+  font-family: "Nanum Gothic", sans-serif;
+  font-weight: 800;
+  background: #03cf5d;
+  border: 3px solid #03cf5d;
+  border-radius: 20px;
+  position: relative;
+  left: 300px;
+}
+
+.loginLink {
+  text-decoration: none;
+  color: white;
+}

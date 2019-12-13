@@ -4,9 +4,11 @@
   "private": true,
   "dependencies": {
     "axios": "^0.19.0",
+    "classnames": "^2.2.6",
     "firebase": "^7.2.3",
     "firebase-admin": "^8.7.0",
     "moment": "^2.24.0",
+    "node-sass": "^4.13.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-google-login": "^5.0.7",
@@ -44,7 +46,7 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://pgg-dev.github.io/boxoffice/",
+  "homepage": "http://boxoffice.dothome.co.kr/",
   "devDependencies": {
     "gh-pages": "^2.1.1"
   }

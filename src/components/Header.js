@@ -1,58 +1,51 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import user from "../images/user.png";
+import { MdSearch } from "react-icons/md";
+import "./Header.scss";
 
-function Header({ loginStatus, onLogin, onLogout }) {
+function Header({ loginStatus, onLogin, onLogout, onClick, onChange }) {
   return (
-    <HeaderContainer>
+    <div className="headerContainer">
+      <h1 className="title">
+        <Link className="HomeLink" to="/">
+          BOX OFFICE
+        </Link>
+      </h1>
+      <div className="box">
+        <div className="search">
+          <input
+            className="searchData"
+            placeholder="yyyymmdd"
+            onChange={onChange}
+          />
+          <button className="searchButton" onClick={onClick}>
+            <MdSearch />
+          </button>
+        </div>
+      </div>
       {loginStatus ? (
-        <LoginButton onClick={onLogout}>
-          <LoginLink to="/">로그아웃</LoginLink>
-        </LoginButton>
+        <div className="login">
+          <button className="loginButton" onClick={onLogout}>
+            <Link className="loginLink" to="/">
+              로그아웃
+            </Link>
+          </button>
+          <div>
+            <img src={user} />
+          </div>
+        </div>
       ) : (
-        <LoginButton onClick={onLogin}>
-          <LoginLink to="/login">로그인 / 가입</LoginLink>
-        </LoginButton>
+        <div className="login">
+          <button className="loginButton" onClick={onLogin}>
+            <Link className="loginLink" to="/login">
+              로그인 / 가입
+            </Link>
+          </button>
+        </div>
       )}
-      <HomeTitle>
-        <HomeLink to="/">BOX OFFICE</HomeLink>
-      </HomeTitle>
-    </HeaderContainer>
+    </div>
   );
 }
-
-const HeaderContainer = styled.div`
-  text-align: center;
-`;
-
-const LoginButton = styled.button`
-  position: relative;
-  right: -100%;
-  padding: 7px;
-  box-sizing: border-box;
-  font-size: 17px;
-  font-family: "Nanum Gothic", sans-serif;
-  font-weight: 800;
-  background: #03cf5d;
-  border: 3px solid #03cf5d;
-  border-radius: 20px;
-`;
-
-const LoginLink = styled(Link)`
-  text-decoration: none;
-  color: white;
-`;
-
-const HomeTitle = styled.h1`
-  font-size: 65px;
-  font-family: "Viga", sans-serif;
-  letter-spacing: 5px;
-  margin: 30px;
-`;
-
-const HomeLink = styled(Link)`
-  text-decoration: none;
-  color: #03cf5d;
-`;
 
 export default Header;

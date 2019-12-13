@@ -1,0 +1,16 @@
+@import "https://fonts.googleapis.com/css?family=Viga&display=swap";
+@import "https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800&display=swap";
+
+body {
+  background-color: #fff;
+}
+
+.container {
+  width: 1300px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+//node-sass 사스로 작성된 코드 css 로 변환
