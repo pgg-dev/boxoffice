@@ -5,12 +5,9 @@ body {
   background-color: #fff;
 }
 
-.container {
-  width: 1300px;
-  height: 100%;
+.wrap {
+  max-width: 1300px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 //node-sass 사스로 작성된 코드 css 로 변환

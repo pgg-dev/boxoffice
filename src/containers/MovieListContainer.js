@@ -17,7 +17,6 @@ function MovieListContainer() {
     next
   } = useSelector(state => state.movies.movies);
   const dispatch = useDispatch();
-  const fixedDate = moment().format("YYYYMMDD") - 1;
 
   useEffect(() => {
     if (dailyData || weeklyData) return;
@@ -26,21 +25,25 @@ function MovieListContainer() {
   //data 의존성 추가하면 날짜값 재설정시 계속 호출됨
   //change 추가하면 계속 오늘자 데이터나옴
 
-  //SyntheticEvent
+  //SyntheticEvent!!!!!!!!!!!!!!!!!!!!
 
-  const handleClick = e => {
-    const fixedDate = moment().format("YYYYMMDD") - 1;
-    const monday = moment()
+  const fixedDate = moment().format("YYYYMMDD") - 1;
+  const sunday =
+    moment()
       .startOf("isoWeek")
-      .format("YYYYMMDD");
+      .format("YYYYMMDD") - 1;
+  const handleClick = e => {
     if (e.target.innerHTML === "일간") {
-      dispatch(getMovies(date, "daily"));
+      if (date === fixedDate) {
+        dispatch(getMovies(date, "daily", false));
+      } else {
+        dispatch(getMovies(date, "daily", true));
+      }
     } else {
-      console.log(monday);
-      console.log(date);
-      console.log(monday >= date);
-      if (monday >= date) {
+      if (sunday - 6 <= date && date <= sunday) {
         dispatch(getMovies(date, "weekly", false));
+      } else if (sunday > date) {
+        dispatch(getMovies(date, "weekly", true));
       } else {
         alert("가장 최근 데이터는 저번 주입니다.");
       }
@@ -58,11 +61,16 @@ function MovieListContainer() {
   const handleNext = () => {
     if (period === "daily") {
       if (date !== fixedDate) {
-        dispatch(getMovies(date + 1, period, true));
+        dispatch(getMovies(parseInt(date) + 1, period, true));
+      } else {
+        dispatch(getMovies(parseInt(date) + 1, period, false));
       }
-      dispatch(getMovies(date + 1, period));
     } else {
-      dispatch(getMovies(parseInt(showRange[1]) + 1, period, true));
+      if (parseInt(showRange[1]) + 7 === sunday) {
+        dispatch(getMovies(parseInt(showRange[1]) + 1, period, false));
+      } else {
+        dispatch(getMovies(parseInt(showRange[1]) + 1, period, true));
+      }
     }
   };
 

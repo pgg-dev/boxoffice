@@ -3,6 +3,7 @@ import moment from "moment";
 import firestore from "../Firestore";
 
 const SET_HEADER_VISIBILITY = "SET_HEADER_VISIBILITY";
+const SET_STAR_RATING = "SET_STAR_RATING";
 
 const SET_LOGIN = "SET_LOGIN";
 const SET_LOGIN_SUCCESS = "SET_LOGIN_SUCCESS";
@@ -29,8 +30,10 @@ export const setHeaderVisibility = visible => async dispatch => {
   dispatch({ type: SET_HEADER_VISIBILITY, visible });
 };
 
-export const setLogin = (provider, id) => async dispatch => {
+export const setLogin = (provider, id, name) => async dispatch => {
   console.log("modules/setLogin");
+  console.log("////////////");
+  console.log(name);
   try {
     firestore
       .collection("users")
@@ -43,13 +46,15 @@ export const setLogin = (provider, id) => async dispatch => {
           docRef.set(
             {
               provider: provider,
-              id: id
+              id: id,
+              name: name,
+              reg_date: moment().format("YYYYMMDD")
             },
             { merge: true }
           );
         }
       });
-    dispatch({ type: SET_LOGIN_SUCCESS, id, provider });
+    dispatch({ type: SET_LOGIN_SUCCESS, id, provider, name });
   } catch (e) {
     dispatch({ type: SET_LOGIN_ERROR });
   }
@@ -96,6 +101,7 @@ const setMovies = rankingData => {
             {
               id: rankingData.movieCd,
               title: rankingData.movieNm,
+              titleEng: detailData.titleEng,
               poster: detailData.posters,
               openDt: moment(rankingData.openDt).format("YYYY년 M월 D일"),
               grade: detailData.rating[0].ratingGrade,
@@ -178,9 +184,16 @@ export const getMovies = (date, period, next) => async dispatch => {
 
   for (let i = 0; i < rankingData.length; i++) {
     await getData(rankingData[i]).then(async data => {
-      period === "daily" ? dailyData.push(data) : weeklyData.push(data);
+      if (period === "daily") {
+        dailyData.push(data);
+        window.localStorage.setItem(period, JSON.stringify(dailyData));
+      } else {
+        weeklyData.push(data);
+        window.localStorage.setItem(period, JSON.stringify(weeklyData));
+      }
     });
   }
+
   dispatch({
     type: GET_MOVIES_SUCCESS,
     date,
@@ -225,6 +238,8 @@ export const getComment = movieId => async dispatch => {
 
 export const addComment = (changComment, movieId) => async dispatch => {
   console.log("addComment");
+  console.log(changComment);
+  console.log(movieId);
   try {
     let docRef = firestore.collection("movies").doc(movieId);
     docRef.set(
@@ -240,15 +255,17 @@ export const addComment = (changComment, movieId) => async dispatch => {
 };
 
 export const deleteComment = (movieId, id) => async dispatch => {
+  console.log(movieId);
+  console.log(id);
   try {
     let docRef = firestore.collection("movies").doc(movieId);
     docRef.get().then(doc => {
       const comments = doc.data().comments;
       for (let i = 0; i < comments.length; i++) {
-        if (comments[i].writer === id) {
+        if (comments[i].id === id) {
           docRef
             .update({
-              comments: comments.filter(comment => comment.writer !== id)
+              comments: comments.filter(comment => comment.id !== id)
             })
             .then(dispatch(getComment(movieId)));
         }
@@ -259,11 +276,15 @@ export const deleteComment = (movieId, id) => async dispatch => {
   }
 };
 
+export const setStarRating = star => dispatch => {
+  dispatch({ type: SET_STAR_RATING, star });
+};
 const initialState = {
   visible: true,
   login: {
     status: false,
     id: null,
+    name: null,
     provider: null
   },
   movies: {
@@ -271,7 +292,7 @@ const initialState = {
     dailyData: null,
     weeklyData: null,
     error: null,
-    date: null,
+    date: "",
     showRange: null,
     period: null,
     next: false
@@ -282,7 +303,8 @@ const initialState = {
     error: null
   },
 
-  comments: []
+  comments: [],
+  star: ""
 };
 
 export default function movies(state = initialState, action) {
@@ -308,6 +330,7 @@ export default function movies(state = initialState, action) {
         login: {
           status: true,
           id: action.id,
+          name: action.name,
           provider: action.provider
         }
       };
@@ -337,7 +360,7 @@ export default function movies(state = initialState, action) {
           dailyData: null,
           weeklyData: null,
           error: null,
-          date: action.date,
+          date: "",
           period: action.period,
           showRange: action.showRange,
           next: false
@@ -367,7 +390,7 @@ export default function movies(state = initialState, action) {
           dailyData: null,
           weeklyData: null,
           error: action.error,
-          date: action.date,
+          date: "",
           period: null
         }
       };
@@ -415,6 +438,12 @@ export default function movies(state = initialState, action) {
         ...state,
         comments: []
       };
+    case SET_STAR_RATING:
+      return {
+        ...state,
+        star: action.star
+      };
+
     default:
       return state;
   }

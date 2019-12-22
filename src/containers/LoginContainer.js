@@ -16,7 +16,7 @@ function LoginContainer() {
 
   const responseGoogle = res => {
     console.log(res);
-    loginProvider("google", res.googleId);
+    loginProvider("google", res.googleId, res.profileObj.name);
   };
 
   const responseKakao = res => {
@@ -25,7 +25,7 @@ function LoginContainer() {
       url: "/v2/user/me",
       success: res => {
         console.log(res);
-        loginProvider("kakao", res.id);
+        loginProvider("kakao", res.id, res.properties.nickname);
       },
       fail: error => {
         console.log(error);
@@ -37,13 +37,13 @@ function LoginContainer() {
     console.error(err);
   };
 
-  const loginProvider = (provider, id) => {
+  const loginProvider = (provider, id, name) => {
     window.sessionStorage.setItem("provider", provider);
 
     // window.localStorage.setItem("kakaoAuth", res);
 
     dispatch(goToHome());
-    dispatch(setLogin(provider, id));
+    dispatch(setLogin(provider, id, name));
   };
 
   return (

@@ -9,7 +9,7 @@ import "./App.scss";
 function App() {
   console.log("App");
   return (
-    <div className="container">
+    <div className="wrap">
       <HearderPage />
       <Switch>
         <Route path="/" component={MovieListPage} exact />

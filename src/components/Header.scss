@@ -4,75 +4,105 @@
   box-sizing: border-box;
 }
 
-.headerContainer {
-  height: 150px;
-  width: 100%;
-  display: flex;
-  align-items: center;
+header {
+  position: relative;
+
+  & .header__inner {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    height: 150px;
+    text-align: center;
+  }
 }
 
-.title {
-  width: 210px;
+.header__title {
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
   font-size: 33px;
   font-family: "Viga", sans-serif;
   letter-spacing: 2px;
+
+  & .header__link {
+    text-decoration: none;
+    color: #03cf5d;
+  }
 }
 
-.HomeLink {
-  text-decoration: none;
-  color: #03cf5d;
-}
-
-.box {
+.login {
+  height: 100%;
   display: flex;
-  width: 640px;
-  justify-content: flex-end;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  & .login__btn {
+    padding: 7px;
+    box-sizing: border-box;
+    font-size: 17px;
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 800;
+    background: #03cf5d;
+    border: 3px solid #03cf5d;
+    border-radius: 20px;
+
+    & .login__link {
+      text-decoration: none;
+      color: white;
+    }
+  }
 }
-.search {
+
+.search__content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
   box-sizing: border-box;
   display: flex;
   width: 400px;
   height: 45px;
   border: 2px solid #03cf5d;
   background: white;
+
+  & .search__input {
+    flex: 1;
+    margin-left: 10px;
+    border: 0;
+    outline: none;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  & .search__button {
+    display: flex;
+    justify-content: center;
+    width: 50px;
+    outline: none;
+    border: 0;
+    background: #03cf5d;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+  }
 }
 
-.searchData {
-  flex: 1;
-  margin-left: 10px;
-  border: 0;
-  outline: none;
-  font-size: 18px;
-  font-weight: bold;
-}
+@media (max-width: 1024px) {
+  header .header__inner {
+    max-width: none;
 
-.searchButton {
-  display: flex;
-  justify-content: center;
-  width: 50px;
-  outline: none;
-  border: 0;
-  background: #03cf5d;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  font-size: 30px;
-}
-
-.loginButton {
-  padding: 7px;
-  box-sizing: border-box;
-  font-size: 17px;
-  font-family: "Nanum Gothic", sans-serif;
-  font-weight: 800;
-  background: #03cf5d;
-  border: 3px solid #03cf5d;
-  border-radius: 20px;
-  position: relative;
-  left: 300px;
-}
-
-.loginLink {
-  text-decoration: none;
-  color: white;
+    padding: 10px 20px;
+  }
+  .search__content {
+    transform: translateY(100px);
+    width: 350px;
+    margin: 10px auto;
+  }
 }
