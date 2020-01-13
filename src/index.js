@@ -12,7 +12,8 @@ import ReduxThunk from "redux-thunk";
 import { Router } from "react-router-dom";
 import { createBrowserHistory } from "history";
 
-const customHistory = createBrowserHistory({ basename: "/boxoffice" });
+// const customHistory = createBrowserHistory({ basename: "/boxoffice" });
+const customHistory = createBrowserHistory();
 
 const store = createStore(
   rootReducer,

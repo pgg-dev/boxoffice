@@ -1,0 +1,168 @@
+@import "./Button.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+.button {
+  @include button;
+
+  & a {
+    color: white;
+  }
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+.menu {
+  //   border: 1px solid;
+
+  & .menu__inner {
+    // border: 1px solid;
+
+    margin: 0 auto;
+
+    & ul {
+      //   border: 5px solid red;
+      border-bottom: 1px solid #e2e2e2;
+      height: 70px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      & li {
+        height: 100%;
+        width: 100%;
+        // border: 1px solid;
+
+        & a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          // border: 1px solid;
+          height: 100%;
+          width: 100%;
+          color: #868e96;
+          font-size: 18px;
+          &:hover {
+            color: black;
+          }
+        }
+      }
+    }
+  }
+}
+
+// .modal-wrapper{
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   background: rgba(0, 0, 0, 0.5);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+// .modal {
+//   background: white;
+//   padding: 24px 16px;
+//   border-radius: 4px;
+//   width: 320px;
+// }
+
+// .modal p {
+//   font-size: 16px;
+// }
+
+// .close-wrapper {
+//   text-align: right;
+// }
+
+.user {
+  text-align: left;
+  padding: 0 30px;
+  & li {
+    padding: 30px 0;
+    & .btn-unregister {
+      border: none;
+      background: white;
+      border-bottom: 2px solid #03cf5d;
+      cursor: pointer;
+      padding: 5px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    & div {
+      padding-top: 20px;
+      & span {
+        font-size: 20px;
+        color: #868e96;
+      }
+    }
+  }
+  & .nickname {
+    & input {
+      height: 40px;
+      font-size: 18px;
+      padding: 3px;
+      border: 1px solid #ced4da;
+      margin: 0;
+    }
+  }
+  & .title {
+    font-size: 27px;
+  }
+  & .row {
+    display: flex;
+    align-items: center;
+    & button {
+      margin-left: 30px;
+    }
+  }
+}
+.list {
+  & .list__inner {
+    & ul {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0;
+      width: 100%;
+
+      & li {
+        display: flex;
+        flex-direction: column;
+        width: 20%;
+        margin: 15px 0;
+        & .title {
+          letter-spacing: -0.5px;
+          line-height: 20px;
+          font-size: 17px;
+          padding: 3px;
+        }
+        & div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          & .star {
+            text-indent: -9999px;
+            background: url("../images/bg_start.png") 0 0 no-repeat;
+            background-position: 0 -20px;
+            display: block;
+            width: 17px;
+            height: 17px;
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+}

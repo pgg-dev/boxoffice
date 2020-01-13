@@ -5,22 +5,30 @@ import MovieList from "../components/MovieList";
 import load from "../images/load.gif";
 import moment from "moment";
 
-function MovieListContainer() {
-  const {
-    dailyData,
-    weeklyData,
-    loading,
-    error,
-    date,
-    period,
-    showRange,
-    next
-  } = useSelector(state => state.movies.movies);
+function MovieListContainer({ path }) {
+  console.log("MovieListContainer");
+
+  const { movieList, loading, error, date, showRange, period } = useSelector(
+    state => state.movies.movies
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (dailyData || weeklyData) return;
-    dispatch(getMovies(date, "daily", next));
+    // if (dailyData.length || weeklyData.length) return;
+    // if (!dailyData.length && !weeklyData.length) {
+    //   path.includes("weekly")
+    //     ? dispatch(getMovies("weekly", sunday))
+    //     : dispatch(getMovies("daily", fixedDate));
+    // } else {
+    // }
+
+    if (movieList.length) return;
+    if (!movieList.length) {
+      path.includes("weekly")
+        ? dispatch(getMovies("weekly", sunday))
+        : dispatch(getMovies("daily", fixedDate));
+    } else {
+    }
   }, [dispatch]);
   //data 의존성 추가하면 날짜값 재설정시 계속 호출됨
   //change 추가하면 계속 오늘자 데이터나옴
@@ -32,68 +40,64 @@ function MovieListContainer() {
     moment()
       .startOf("isoWeek")
       .format("YYYYMMDD") - 1;
-  const handleClick = e => {
-    if (e.target.innerHTML === "일간") {
-      if (date === fixedDate) {
-        dispatch(getMovies(date, "daily", false));
-      } else {
-        dispatch(getMovies(date, "daily", true));
-      }
+
+  const handleClick = period => {
+    if (period === "weekly") {
+      date > sunday
+        ? dispatch(getMovies(period, sunday))
+        : dispatch(getMovies(period, date));
     } else {
-      if (sunday - 6 <= date && date <= sunday) {
-        dispatch(getMovies(date, "weekly", false));
-      } else if (sunday > date) {
-        dispatch(getMovies(date, "weekly", true));
-      } else {
-        alert("가장 최근 데이터는 저번 주입니다.");
-      }
+      dispatch(getMovies(period, date));
     }
   };
 
-  const handlePrev = () => {
+  const handleChangeDate = e => {
+    if (e.target.name === "prev") {
+      period === "daily"
+        ? dispatch(getMovies(period, parseInt(date) - 1))
+        : dispatch(getMovies(period, parseInt(showRange[0]) - 1));
+    } else {
+      period === "daily"
+        ? dispatch(getMovies(period, parseInt(date) + 1))
+        : dispatch(getMovies(period, parseInt(showRange[1]) + 1));
+    }
+  };
+
+  const nextDate = () => {
+    console.log("nextDate");
     if (period === "daily") {
-      dispatch(getMovies(date - 1, period, true));
+      return date !== fixedDate ? "on" : "";
     } else {
-      dispatch(getMovies(parseInt(showRange[0]) - 1, period, true));
+      return parseInt(showRange[1]) !== sunday ? "on" : "";
     }
   };
 
-  const handleNext = () => {
-    if (period === "daily") {
-      if (date !== fixedDate) {
-        dispatch(getMovies(parseInt(date) + 1, period, true));
-      } else {
-        dispatch(getMovies(parseInt(date) + 1, period, false));
-      }
-    } else {
-      if (parseInt(showRange[1]) + 7 === sunday) {
-        dispatch(getMovies(parseInt(showRange[1]) + 1, period, false));
-      } else {
-        dispatch(getMovies(parseInt(showRange[1]) + 1, period, true));
-      }
-    }
+  const activeStyle = {
+    color: "red",
+    border: "1px solid red",
+    fontWeight: "bold"
   };
 
-  if (loading && !dailyData && !weeklyData)
+  if (loading)
     return (
       <div>
-        <img src={load} alt="Loading..." />
+        <img src={load} alt="Loading" />
       </div>
     );
   if (error) return <div>에러 발생</div>;
-  if (!dailyData && !weeklyData) return <div>데이터 없음</div>;
+  if (!movieList.length) return <div>데이터 없음</div>;
 
   return (
     <MovieList
       loading={loading}
       onClick={handleClick}
       date={date}
-      movies={period === "daily" ? dailyData : weeklyData}
-      period={period}
+      movieList={movieList}
       showRange={showRange}
-      onPrev={handlePrev}
-      onNext={handleNext}
-      next={next}
+      onChangeDate={handleChangeDate}
+      period={period}
+      activeStyle={activeStyle}
+      nextDate={nextDate}
     />
   );
 }

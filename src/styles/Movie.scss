@@ -27,6 +27,37 @@
           border-bottom: 1px solid #d9d9d9;
           line-height: 1.7;
         }
+        & button {
+          cursor: pointer;
+          border: 1px solid #d9d9d9;
+          width: 110px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: white;
+          outline: none;
+
+          &:hover {
+            border: 1px solid black;
+          }
+
+          & .empty {
+            text-indent: -9999px;
+            width: 16px;
+            height: 14px;
+            background: url("../images/ico_movie.png") 0 0 no-repeat;
+            background-position: -210px -330px;
+            margin-right: 4px;
+          }
+          & .heart {
+            background-position: -230px -330px;
+          }
+          & span {
+            font-weight: bold;
+            font-size: 15px;
+          }
+        }
       }
     }
 
@@ -76,10 +107,17 @@
     & textarea {
       flex: 1;
       border: 1px solid #e5e5e5;
+      padding: 16px 165px 0 20px;
+      border-left: none;
     }
 
     & button {
+      cursor: pointer;
       width: 80px;
+      background: #03cf5d;
+      color: white;
+      border: none;
+      outline: none;
     }
   }
 }

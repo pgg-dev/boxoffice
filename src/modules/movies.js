@@ -3,12 +3,13 @@ import moment from "moment";
 import firestore from "../Firestore";
 
 const SET_HEADER_VISIBILITY = "SET_HEADER_VISIBILITY";
-const SET_STAR_RATING = "SET_STAR_RATING";
 
 const SET_LOGIN = "SET_LOGIN";
 const SET_LOGIN_SUCCESS = "SET_LOGIN_SUCCESS";
 const SET_LOGIN_ERROR = "SET_LOGIN_ERROR";
 const SET_LOGOUT = "SET_LOGOUT";
+
+const GET_USER = "GET_USER";
 
 const GET_MOVIES = "GET_MOVIES";
 const GET_MOVIES_SUCCESS = "GET_MOVIES_SUCCESS";
@@ -21,8 +22,8 @@ const GET_MOVIE_ERROR = "GET_MOVIE_ERROR";
 const GET_COMMENT_SUCCESS = "GET_COMMENT_SUCCESS";
 const GET_COMMENT_ERROR = "GET_COMMENT_ERROR";
 
-export const goToHome = () => (dispatch, getState, { history }) => {
-  history.push("/");
+export const goToPath = path => (dispatch, getState, { history }) => {
+  history.push(path);
 };
 
 export const setHeaderVisibility = visible => async dispatch => {
@@ -32,8 +33,7 @@ export const setHeaderVisibility = visible => async dispatch => {
 
 export const setLogin = (provider, id, name) => async dispatch => {
   console.log("modules/setLogin");
-  console.log("////////////");
-  console.log(name);
+
   try {
     firestore
       .collection("users")
@@ -43,116 +43,102 @@ export const setLogin = (provider, id, name) => async dispatch => {
         if (snapshot.empty) {
           let docRef = firestore.collection("users").doc();
 
-          docRef.set(
-            {
-              provider: provider,
-              id: id,
-              name: name,
-              reg_date: moment().format("YYYYMMDD")
-            },
-            { merge: true }
-          );
+          docRef
+            .set(
+              {
+                provider: provider,
+                id: id,
+                name: name,
+                reg_date: moment().format("YYYYMMDD"),
+                wishList: [],
+                commentList: []
+              },
+              { merge: true }
+            )
+            .then(dispatch(getUser(id)));
+        } else {
+          dispatch(getUser(id));
         }
       });
-    dispatch({ type: SET_LOGIN_SUCCESS, id, provider, name });
+
+    // dispatch({ type: SET_LOGIN_SUCCESS, id, provider, name });
   } catch (e) {
     dispatch({ type: SET_LOGIN_ERROR });
   }
 };
 
+export const updateUser = (item, id, data) => dispatch => {
+  console.log("updateUser");
+
+  try {
+    firestore
+      .collection("users")
+      .where("id", "==", id)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          const docId = firestore.collection("users").doc(doc.id);
+          if (item === "delete") {
+            docId.delete();
+          } else {
+            docId
+              .update({
+                [item]: data
+              })
+              .then(dispatch(getUser(id)));
+          }
+        });
+      });
+  } catch (e) {}
+};
+
+export const getUser = id => dispatch => {
+  console.log("getUser");
+  try {
+    firestore
+      .collection("users")
+      .where("id", "==", id)
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          const {
+            id,
+            name,
+            provider,
+            reg_date,
+            wishList,
+            commentList
+          } = doc.data();
+          dispatch({
+            type: GET_USER,
+            id,
+            name,
+            provider,
+            reg_date,
+            wishList,
+            commentList
+          });
+        });
+      });
+  } catch (e) {}
+};
+
 export const setLogout = () => async dispatch => {
+  window.sessionStorage.clear();
+  dispatch(goToPath("/"));
   dispatch({ type: SET_LOGOUT });
 };
 
-const setMovies = rankingData => {
-  return new Promise(async resolve => {
-    await axios
-      .get(
-        "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
-        {
-          params: {
-            ServiceKey: "JIB0YUBGVC07GLD5WFBD",
-            collection: "kmdb_new",
-            title: rankingData.movieNm,
-            releaseDts: rankingData.openDt.replace(/-/gi, "")
-          }
-        }
-      )
-      .then(data => {
-        let items = data.data.Data[0];
-        if (items.hasOwnProperty("Result")) {
-          const detailData = items.Result[0];
-
-          console.log(detailData);
-          if (detailData.posters.includes("|"))
-            detailData.posters = detailData.posters.substring(
-              0,
-              detailData.posters.indexOf("|")
-            );
-
-          if (detailData.rating[0].ratingGrade.includes("|"))
-            detailData.rating[0].ratingGrade = detailData.rating[0].ratingGrade.substring(
-              0,
-              detailData.rating[0].ratingGrade.indexOf("|")
-            );
-
-          let docRef = firestore.collection("movies").doc(rankingData.movieCd);
-          docRef.set(
-            {
-              id: rankingData.movieCd,
-              title: rankingData.movieNm,
-              titleEng: detailData.titleEng,
-              poster: detailData.posters,
-              openDt: moment(rankingData.openDt).format("YYYY년 M월 D일"),
-              grade: detailData.rating[0].ratingGrade,
-              genre: detailData.genre,
-              runtime: detailData.runtime,
-              director: detailData.director[0].directorNm,
-              actors: [
-                detailData.actor[0].actorNm,
-                detailData.actor[1].actorNm
-              ],
-              plot: detailData.plot
-            },
-            { merge: true }
-          );
-
-          resolve(rankingData);
-        } else {
-          return rankingData;
-        }
-      });
-  });
-};
-
-const getData = rankingData => {
-  return new Promise(resolve =>
-    firestore
-      .collection("movies")
-      .doc(rankingData.movieCd)
-      .get()
-      .then(async doc => {
-        if (!doc.exists) {
-          await setMovies(rankingData).then(data => resolve(getData(data)));
-        } else {
-          const childData = doc.data();
-          resolve(childData);
-        }
-      })
-  );
-};
-
-export const getMovies = (date, period, next) => async dispatch => {
-  const key = "8512edd89b714bf2cf35fcb50adac48d";
-  let rankingData;
-  let dailyData = [];
-  let weeklyData = [];
-  let showRange;
+export const getMovies = (period, date) => async (dispatch, getState) => {
+  console.log("getMovies");
+  console.log(period);
+  console.log(date);
   dispatch({ type: GET_MOVIES });
 
-  if (date === "" || !date) {
-    date = moment().format("YYYYMMDD") - 1;
-  }
+  let { movieList } = getState().movies.movies;
+  const key = "8512edd89b714bf2cf35fcb50adac48d";
+  let rankingData = [];
+  let showRange;
 
   const getRankingData = async api => {
     const {
@@ -167,49 +153,130 @@ export const getMovies = (date, period, next) => async dispatch => {
         }
       }
     );
-
     showRange = boxOfficeResult.showRange.split("~");
     return boxOfficeResult;
   };
 
-  if (period === "daily") {
-    await getRankingData("searchDailyBoxOfficeList").then(
-      data => (rankingData = data.dailyBoxOfficeList)
-    );
-  } else {
-    await getRankingData("searchWeeklyBoxOfficeList").then(
-      data => (rankingData = data.weeklyBoxOfficeList)
-    );
-  }
+  const setMovies = rankingData => {
+    return new Promise(resolve => {
+      axios
+        .get(
+          "http://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json.jsp",
+          {
+            params: {
+              ServiceKey: "JIB0YUBGVC07GLD5WFBD",
+              collection: "kmdb_new",
+              title: rankingData.movieNm,
+              releaseDts: rankingData.openDt.replace(/-/gi, "")
+            }
+          }
+        )
+        .then(data => {
+          let items = data.data.Data[0];
+          if (items.hasOwnProperty("Result")) {
+            const detailData = items.Result[0];
 
-  for (let i = 0; i < rankingData.length; i++) {
-    await getData(rankingData[i]).then(async data => {
-      if (period === "daily") {
-        dailyData.push(data);
-        window.localStorage.setItem(period, JSON.stringify(dailyData));
-      } else {
-        weeklyData.push(data);
-        window.localStorage.setItem(period, JSON.stringify(weeklyData));
-      }
+            console.log(detailData);
+            if (detailData.posters.includes("|"))
+              detailData.posters = detailData.posters.substring(
+                0,
+                detailData.posters.indexOf("|")
+              );
+
+            if (detailData.rating[0].ratingGrade.includes("|"))
+              detailData.rating[0].ratingGrade = detailData.rating[0].ratingGrade.substring(
+                0,
+                detailData.rating[0].ratingGrade.indexOf("|")
+              );
+
+            let docRef = firestore
+              .collection("movies")
+              .doc(rankingData.movieCd);
+            docRef.set(
+              {
+                id: rankingData.movieCd,
+                title: rankingData.movieNm,
+                titleEng: detailData.titleEng,
+                poster: detailData.posters,
+                openDt: moment(rankingData.openDt).format("YYYY년 M월 D일"),
+                grade: detailData.rating[0].ratingGrade,
+                genre: detailData.genre,
+                runtime: detailData.runtime,
+                director: detailData.director[0].directorNm,
+                actors: [
+                  detailData.actor[0].actorNm,
+                  detailData.actor[1].actorNm
+                ],
+                plot: detailData.plot,
+                comments: []
+              },
+              { merge: true }
+            );
+            resolve(rankingData);
+          } else {
+            return rankingData;
+          }
+        });
+    });
+  };
+
+  const getData = rankingData => {
+    return new Promise(resolve => {
+      firestore
+        .collection("movies")
+        .doc(rankingData.movieCd)
+        .get()
+        .then(doc => {
+          if (!doc.exists) {
+            setMovies(rankingData).then(data => resolve(getData(data)));
+          } else {
+            resolve(doc.data());
+          }
+        });
+    });
+  };
+
+  const getMovieList = () => {
+    for (let i = 0; i < rankingData.length; i++) {
+      movieList.push(getData(rankingData[i]));
+    }
+    Promise.all(movieList).then(movieList => {
+      dispatch({
+        type: GET_MOVIES_SUCCESS,
+        date,
+        showRange,
+        movieList,
+        period
+      });
+    });
+  };
+
+  if (period === "daily") {
+    getRankingData("searchDailyBoxOfficeList").then(data => {
+      rankingData = data.dailyBoxOfficeList;
+      getMovieList();
+    });
+  } else {
+    getRankingData("searchWeeklyBoxOfficeList").then(data => {
+      rankingData = data.weeklyBoxOfficeList;
+      getMovieList();
     });
   }
-
-  dispatch({
-    type: GET_MOVIES_SUCCESS,
-    date,
-    period,
-    showRange,
-    dailyData,
-    weeklyData,
-    next
-  });
 };
 
 export const getMovie = movieId => async dispatch => {
   console.log("modules/getMovie");
   dispatch({ type: GET_MOVIE });
   try {
-    dispatch({ type: GET_MOVIE_SUCCESS, movieId });
+    firestore
+      .collection("movies")
+      .doc(movieId)
+      .get()
+      .then(doc => {
+        const payload = doc.data();
+        console.log(payload);
+        dispatch({ type: GET_MOVIE_SUCCESS, payload });
+      });
   } catch (e) {
     dispatch({ type: GET_MOVIE_ERROR, error: e });
   }
@@ -223,11 +290,13 @@ export const getComment = movieId => async dispatch => {
       .doc(movieId)
       .get()
       .then(doc => {
+        const payload = [];
         if (doc.data().comments !== undefined) {
-          const payload = [];
           doc.data().comments.forEach(comment => {
             payload.push(comment);
           });
+          dispatch({ type: GET_COMMENT_SUCCESS, payload });
+        } else {
           dispatch({ type: GET_COMMENT_SUCCESS, payload });
         }
       });
@@ -236,10 +305,8 @@ export const getComment = movieId => async dispatch => {
   }
 };
 
-export const addComment = (changComment, movieId) => async dispatch => {
-  console.log("addComment");
-  console.log(changComment);
-  console.log(movieId);
+export const updateComment = (changComment, movieId) => dispatch => {
+  console.log("updateComment");
   try {
     let docRef = firestore.collection("movies").doc(movieId);
     docRef.set(
@@ -254,48 +321,40 @@ export const addComment = (changComment, movieId) => async dispatch => {
   }
 };
 
-export const deleteComment = (movieId, id) => async dispatch => {
-  console.log(movieId);
-  console.log(id);
+export const resetComment = (movieId, id) => dispatch => {
+  console.log("resetComment");
   try {
-    let docRef = firestore.collection("movies").doc(movieId);
-    docRef.get().then(doc => {
-      const comments = doc.data().comments;
-      for (let i = 0; i < comments.length; i++) {
-        if (comments[i].id === id) {
-          docRef
-            .update({
-              comments: comments.filter(comment => comment.id !== id)
-            })
-            .then(dispatch(getComment(movieId)));
-        }
-      }
+    movieId.forEach(item => {
+      firestore
+        .collection("movies")
+        .doc(item)
+        .get()
+        .then(doc => {
+          const comments = doc.data().comments;
+          const changComment = comments.filter(comment => comment.id !== id);
+          dispatch(updateComment(changComment, item));
+        });
     });
-  } catch (e) {
-    dispatch({ type: GET_COMMENT_ERROR, error: e });
-  }
+  } catch (e) {}
 };
 
-export const setStarRating = star => dispatch => {
-  dispatch({ type: SET_STAR_RATING, star });
-};
 const initialState = {
   visible: true,
-  login: {
-    status: false,
+  user: {
+    login: false,
     id: null,
     name: null,
-    provider: null
+    provider: null,
+    wishList: [],
+    commentList: []
   },
   movies: {
     loading: false,
-    dailyData: null,
-    weeklyData: null,
     error: null,
     date: "",
-    showRange: null,
+    showRange: [],
     period: null,
-    next: false
+    movieList: []
   },
   movie: {
     loading: false,
@@ -303,8 +362,7 @@ const initialState = {
     error: null
   },
 
-  comments: [],
-  star: ""
+  comments: []
 };
 
 export default function movies(state = initialState, action) {
@@ -318,8 +376,8 @@ export default function movies(state = initialState, action) {
     case SET_LOGIN:
       return {
         ...state,
-        login: {
-          status: false,
+        user: {
+          login: false,
           id: null,
           type: null
         }
@@ -327,8 +385,8 @@ export default function movies(state = initialState, action) {
     case SET_LOGIN_SUCCESS:
       return {
         ...state,
-        login: {
-          status: true,
+        user: {
+          login: true,
           id: action.id,
           name: action.name,
           provider: action.provider
@@ -337,17 +395,34 @@ export default function movies(state = initialState, action) {
     case SET_LOGIN_ERROR:
       return {
         ...state,
-        login: {
-          status: false,
+        user: {
+          login: false,
           id: null
         }
       };
     case SET_LOGOUT:
       return {
         ...state,
-        login: {
-          status: false,
-          id: null
+        user: {
+          login: false,
+          id: null,
+          name: null,
+          provider: null,
+          wishList: [],
+          commentList: []
+        }
+      };
+
+    case GET_USER:
+      return {
+        ...state,
+        user: {
+          login: true,
+          id: action.id,
+          name: action.name,
+          provider: action.provider,
+          wishList: action.wishList,
+          commentList: action.commentList
         }
       };
 
@@ -357,13 +432,11 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: true,
-          dailyData: null,
-          weeklyData: null,
+          movieList: [],
           error: null,
           date: "",
           period: action.period,
-          showRange: action.showRange,
-          next: false
+          showRange: action.showRange
         }
       };
     case GET_MOVIES_SUCCESS:
@@ -372,13 +445,11 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: false,
-          dailyData: action.dailyData,
-          weeklyData: action.weeklyData,
+          movieList: action.movieList,
           error: null,
           date: action.date,
           period: action.period,
-          showRange: action.showRange,
-          next: action.next
+          showRange: action.showRange
         }
       };
     case GET_MOVIES_ERROR:
@@ -387,8 +458,7 @@ export default function movies(state = initialState, action) {
         visible: true,
         movies: {
           loading: false,
-          dailyData: null,
-          weeklyData: null,
+          movieList: [],
           error: action.error,
           date: "",
           period: null
@@ -408,14 +478,7 @@ export default function movies(state = initialState, action) {
         ...state,
         movie: {
           loading: false,
-          data:
-            state.movies.period === "daily"
-              ? state.movies.dailyData.find(
-                  movie => movie.id === action.movieId
-                )
-              : state.movies.weeklyData.find(
-                  movie => movie.id === action.movieId
-                ),
+          data: action.payload,
           error: null
         }
       };
@@ -437,11 +500,6 @@ export default function movies(state = initialState, action) {
       return {
         ...state,
         comments: []
-      };
-    case SET_STAR_RATING:
-      return {
-        ...state,
-        star: action.star
       };
 
     default:

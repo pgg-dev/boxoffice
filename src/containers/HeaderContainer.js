@@ -1,86 +1,60 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
-import { setLogout, setLogin } from "../modules/movies";
+import { getUser } from "../modules/movies";
 import { getMovies } from "../modules/movies";
 import moment from "moment";
+import { withRouter } from "react-router-dom";
 
 function HeaderContainer() {
   console.log("/containers/HeaderContainer");
+
   const { visible } = useSelector(state => state.movies);
-  const { period, date } = useSelector(state => state.movies.movies);
-  const { status, provider, id } = useSelector(state => state.movies.login);
+  const { period } = useSelector(state => state.movies.movies);
+  const { login, id,name } = useSelector(state => state.movies.user);
   const dispatch = useDispatch();
+  const [date, setDate] = useState("");
 
   useEffect(() => {
-    if (!status && provider) {
-      const provider = window.sessionStorage.getItem("provider");
-
-      if (provider === "kakao") {
+    setDate("");
+    const getSession = window.sessionStorage.getItem("provider");
+    if (!login && getSession) {
+      if (getSession === "kakao") {
         if (!window.Kakao.hasOwnProperty("Auth")) {
           window.Kakao.init("09cacdaaabf08e5b95d7d9c603f1361b");
         }
         window.Kakao.Auth.getStatusInfo(data => {
-          // dispatch(
-          //   setLogin(provider, data.user.id, data.user.properties.nickname)
-          // );
+          if (data.status === "connected") {
+            dispatch(getUser(data.user.id));
+          }
         });
       } else {
-        if (window.gapi.hasOwnProperty("auth2")) {
-          const logout = window.gapi.auth2.getAuthInstance();
-          logout.signOut();
-          console.log("구글 로그아웃 성공");
-          dispatch(setLogout());
-          window.sessionStorage.clear();
-        } else {
+        if (!window.gapi.hasOwnProperty("auth2")) {
           window.gapi.load("auth2", () => {
-            window.gapi.auth2.init({
-              client_id:
-                "822311017221-vqnjoe6mjbljr9cp1dvoeahjil2mhh9v.apps.googleusercontent.com"
-            });
+            window.gapi.auth2
+              .init({
+                client_id:
+                  "822311017221-vqnjoe6mjbljr9cp1dvoeahjil2mhh9v.apps.googleusercontent.com"
+              })
+              .then(user => {
+                const userId = user.currentUser.get().getId();
+                dispatch(getUser(userId));
+              });
           });
         }
       }
     }
-  }, [dispatch, id, status]);
+  }, [dispatch, id, login]);
 
   if (!visible) return null;
 
-  const onLogout = () => {
-    console.log("onLogout");
-    if (provider === "kakao") {
-      window.Kakao.Auth.logout();
-      console.log("카카오 로그아웃 성공");
-      dispatch(setLogout());
-      window.sessionStorage.clear();
-    } else {
-      const logout = window.gapi.auth2.getAuthInstance();
-      logout.signOut();
-      console.log("구글 로그아웃 성공");
-      dispatch(setLogout());
-      window.sessionStorage.clear();
-    }
-  };
-  // switch (provider) {
-  //   case "kakao":
-  //     return window.Kakao.Auth.logout();
-  //   case "google":
-  //     const logout = window.gapi.auth2.getAuthInstance();
-  //     logout.signOut();
-  //     return console.log("구글 로그아웃 성공");
-  //   default:
-  //     break;
-  // }
-  // dispatch(setLogout());
-  // window.sessionStorage.clear();
-
-  let changeDate = "";
   const handleChange = e => {
-    changeDate = e.target.value;
+    setDate(e.target.value);
   };
 
-  const handleClick = e => {
-    if (!isDateFormat(changeDate)) {
+  const handleSearch = e => {
+    e.preventDefault();
+    if (!isDateFormat(date)) {
       alert("날짜를 정확히 입력해주세요.");
     } else {
       dateCheck();
@@ -111,70 +85,45 @@ function HeaderContainer() {
     return day > 0 && day <= monthLength[month - 1];
   }
 
+  const fixedDate = moment().format("YYYYMMDD") - 1;
+  const sunday =
+    moment()
+      .startOf("isoWeek")
+      .format("YYYYMMDD") - 1;
   const dateCheck = () => {
-    const fixedDate = moment().format("YYYYMMDD") - 1;
-    if (fixedDate < parseInt(changeDate)) {
-      alert("검색 할 수 없습니다.");
+    if (fixedDate < parseInt(date)) {
+      period === "daily"
+        ? alert("가장 최근 데이터는 어제입니다.")
+        : alert("가장 최근 데이터는 저번 주입니다.");
     } else {
       if (period === "daily") {
-        if (fixedDate === parseInt(changeDate)) {
-          dispatch(getMovies(changeDate, period, false));
-        } else {
-          dispatch(getMovies(changeDate, period, true));
-        }
+        dispatch(getMovies(period, date));
       } else {
-        const sunday =
-          moment()
-            .startOf("isoWeek")
-            .format("YYYYMMDD") - 1;
-
-        if (
-          sunday - 6 <= parseInt(changeDate) &&
-          parseInt(changeDate) <= sunday
-        ) {
-          dispatch(getMovies(changeDate, "weekly", false));
-        } else if (sunday > parseInt(changeDate)) {
-          dispatch(getMovies(changeDate, "weekly", true));
+        if (sunday - 6 <= parseInt(date) && parseInt(date) <= sunday) {
+          dispatch(getMovies(period, date));
+        } else if (sunday > parseInt(date)) {
+          dispatch(getMovies(period, date));
         } else {
           alert("가장 최근 데이터는 저번 주입니다.");
         }
       }
     }
+  };
 
-    // if (period === "daily") {
-    //   if (fixedDate < changeDate) {
-    //     alert("검색 할 수 없습니다.");
-    //   } else {
-    //     if (fixedDate === changeDate) {
-    //       dispatch(getMovies(changeDate, period, false));
-    //     } else {
-    //       dispatch(getMovies(changeDate, period, true));
-    //     }
-    //   }
-    // } else {
-    //   const sunday =
-    //     moment()
-    //       .startOf("isoWeek")
-    //       .format("YYYYMMDD") - 1;
-    //   console.log(sunday);
-    //   console.log(changeDate);
-
-    //   if (sunday <= changeDate) {
-    //     dispatch(getMovies(changeDate, "weekly", false));
-    //   } else {
-    //     alert("검색 할 수 없습니다.");
-    //   }
-    // }
+  const handleClick = () => {
+    dispatch(getMovies("daily", fixedDate));
   };
   return (
     <Header
-      loginStatus={status}
-      onLogout={onLogout}
-      onClick={handleClick}
+      login={login}
+      onSearch={handleSearch}
       onChange={handleChange}
+      period={period}
       date={date}
+      onClick={handleClick}
+      name={name}
     />
   );
 }
 
-export default HeaderContainer;
+export default withRouter(HeaderContainer);

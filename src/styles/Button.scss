@@ -1,0 +1,15 @@
+@import url("https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800&display=swap");
+
+@mixin button {
+  padding: 0 10px;
+  font-family: "Nanum Gothic", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  background: #03cf5d;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  height: 40px;
+  color: white;
+  cursor: pointer;
+}

@@ -1,40 +1,40 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import moment from "moment";
-import "./MovieList.scss";
-import classNames from "classnames";
+import "../styles/MovieList.scss";
 
 function MovieList({
   onClick,
-  movies,
+  movieList,
   date,
-  period,
   showRange,
-  onPrev,
-  onNext,
-  next
+  onChangeDate,
+  period,
+  activeStyle,
+  nextDate
 }) {
+  console.log("MovieList");
+
   return (
     <div className="movie-content">
       <div className="movie-content__inner">
         <div className="period">
           <ul>
-            <li
-              className={period === "daily" ? "daily" : null}
-              onClick={onClick}
-            >
-              일간
-            </li>
-            <li
-              className={period === "weekly" ? "weekly" : null}
-              onClick={onClick}
-            >
-              주간
-            </li>
+            <NavLink exact to="/" activeStyle={activeStyle}>
+              <li onClick={e => onClick("daily")}>일간</li>
+            </NavLink>
+
+            <NavLink to="/weekly" activeStyle={activeStyle}>
+              <li onClick={e => onClick("weekly")}>주간</li>
+            </NavLink>
           </ul>
 
           <div className="period__date">
-            <button className="btn-prev" onClick={onPrev}></button>
+            <button
+              name="prev"
+              className="btn-prev"
+              onClick={onChangeDate}
+            ></button>
             <span>
               {period === "daily"
                 ? moment(date.toString()).format("YYYY.MM.DD")
@@ -43,14 +43,14 @@ function MovieList({
                   moment(showRange[1]).format("YYYY.MM.DD")}
             </span>
             <button
-              className={classNames("btn-next", { next })}
-              onClick={onNext}
-              disabled={!next}
+              name="next"
+              className={`btn-next ${nextDate()}`}
+              onClick={onChangeDate}
             ></button>
           </div>
         </div>
         <ul className="movie-list">
-          {movies.map((movie, index) => (
+          {movieList.map((movie, index) => (
             <li className="movie-list__item" key={index}>
               <h1 className="rank">{index + 1}</h1>
               <Link to={`/${movie.id}`}>

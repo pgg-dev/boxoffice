@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Login from "../components/Login";
-import { setHeaderVisibility, setLogin, goToHome } from "../modules/movies";
+import { setHeaderVisibility, setLogin, goToPath } from "../modules/movies";
 
 function LoginContainer() {
   console.log("containers/LoginContainer");
@@ -39,11 +39,8 @@ function LoginContainer() {
 
   const loginProvider = (provider, id, name) => {
     window.sessionStorage.setItem("provider", provider);
-
-    // window.localStorage.setItem("kakaoAuth", res);
-
-    dispatch(goToHome());
     dispatch(setLogin(provider, id, name));
+    dispatch(goToPath("/"));
   };
 
   return (

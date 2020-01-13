@@ -2,48 +2,51 @@ import React from "react";
 import { Link } from "react-router-dom";
 import user from "../images/user.png";
 import { MdSearch } from "react-icons/md";
-import "./Header.scss";
+import "../styles/Header.scss";
 
-function Header({ loginStatus, onLogin, onLogout, onClick, onChange, date }) {
+function Header({ login, onSearch, onChange, date, onClick, name }) {
   return (
     <header className="header">
       <div className="header__inner">
-        <h1 className="header__title">
+        <h1 className="header__title" onClick={onClick}>
           <Link className="header__link" to="/">
             BOX OFFICE
           </Link>
         </h1>
-        {loginStatus ? (
+        {login ? (
           <div className="login">
-            <button onClick={onLogout}>
-              <Link className="login__link" to="/">
-                로그아웃
+            <div className="user">
+              <Link to="/user">
+                <img src={user} />
+                <span>
+                  <strong>{name}</strong>님
+                </span>
               </Link>
-            </button>
-            <div>
-              <img src={user} />
             </div>
           </div>
         ) : (
           <div className="login">
-            <button className="login__btn" onClick={onLogin}>
-              <Link className="login__link" to="/login">
-                로그인 / 가입
-              </Link>
-            </button>
+            <Link className="login__link" to="/login">
+              <button className="login__btn">로그인 / 가입</button>
+            </Link>
           </div>
         )}
 
-        <div className="search__content">
+        <form className="search__content">
+          {/* <select>
+            <option>날짜</option>
+            <option>이름</option>
+          </select> */}
           <input
+            value={date}
             className="search__input"
             placeholder="yyyymmdd"
             onChange={onChange}
           />
-          <button className="search__button" onClick={onClick}>
+          <button className="search__button" onClick={onSearch}>
             <MdSearch />
           </button>
-        </div>
+        </form>
       </div>
     </header>
   );
