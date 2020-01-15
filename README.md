@@ -8,19 +8,26 @@ http://boxoffice.dothome.co.kr/
 
 ## Features
 
-### MovieListPage
+### MovieList Page
 
-![MovieListPage](./readme/movieList.gif)
+![](./readme/MovieListPage.gif)
 
 - 기준 일자의 박스오피스 정보 제공
 - 날짜를 이용하여 박스오피스 검색
 
-### MoviePage
+### Movie Page
+![](./readme/MoviePage.gif)
 
 - 영화 별 상세 정보 제공
 - 댓글 입력 및 삭제
 
-### LoginPage
+### User Page
+![](./readme/UserPage.gif)
+
+- SNS 계정을 통한 회원가입 및 로그인
+- 회원가입 시 Firebase에 회원 정보 저장
+
+### Login Page
 
 - SNS 계정을 통한 회원가입 및 로그인
 - 회원가입 시 Firebase에 회원 정보 저장
