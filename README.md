@@ -1,4 +1,5 @@
 # BOX OFFICE
+
 http://boxoffice.dothome.co.kr/
 
 ## About
@@ -8,6 +9,8 @@ http://boxoffice.dothome.co.kr/
 ## Features
 
 ### MovieListPage
+
+![MovieListPage](./readme/movieList.gif)
 
 - 기준 일자의 박스오피스 정보 제공
 - 날짜를 이용하여 박스오피스 검색
