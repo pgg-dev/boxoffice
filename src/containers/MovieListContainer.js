@@ -14,14 +14,6 @@ function MovieListContainer({ path }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // if (dailyData.length || weeklyData.length) return;
-    // if (!dailyData.length && !weeklyData.length) {
-    //   path.includes("weekly")
-    //     ? dispatch(getMovies("weekly", sunday))
-    //     : dispatch(getMovies("daily", fixedDate));
-    // } else {
-    // }
-
     if (movieList.length) return;
     if (!movieList.length) {
       path.includes("weekly")

@@ -16,7 +16,7 @@ function Login({ responseGoogle, responseKakao, responseFail }) {
             </Link>
           </span>
           <GoogleLogin
-            clientId="822311017221-h01ovlahim0ki0mo0k2pt9qv7260u3r3.apps.googleusercontent.com"
+            clientId="822311017221-b5432nvimnhii88bt8eschpnsk402ibq.apps.googleusercontent.com"
             render={renderProps => (
               <GoogleButton
                 onClick={renderProps.onClick}
@@ -28,7 +28,6 @@ function Login({ responseGoogle, responseKakao, responseFail }) {
             onSuccess={responseGoogle}
             onFailure={responseFail}
           />
-
           <KakaoButton
             jsKey="09cacdaaabf08e5b95d7d9c603f1361b"
             buttonText="카카오로 시작"

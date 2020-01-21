@@ -1,6 +1,7 @@
 # BOX OFFICE
 
 http://boxoffice.dothome.co.kr/
+(현재 크롬에서 지원 중입니다.)
 
 ## About
 

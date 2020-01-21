@@ -10,13 +10,13 @@ function User({
   wishList,
   commentList,
   unregisterModal,
-  unregisterModalOpen,
-  resetModalOpen,
   resetModal,
   onLogout,
   activeStyle,
   onReset,
-  onUnregister
+  onUnregister,
+  setResetModal,
+  setUnregisterModal
 }) {
   console.log("User");
 
@@ -61,7 +61,11 @@ function User({
                 <span className="title">초기화</span>
                 <div className="row">
                   <span>별점 평가의 내역을 초기화 합니다.</span>
-                  <button className="button" onClick={resetModalOpen}>
+                  {/* <button className="button" onClick={resetModalOpen}> */}
+                  <button
+                    className="button"
+                    onClick={() => setResetModal("flex")}
+                  >
                     초기화
                   </button>
                 </div>
@@ -71,20 +75,6 @@ function User({
                   <br />
                   초기화를 하시겠어요?
                 </Modal>
-                {/* <div className="modal-wrapper" style={{ display: resetModal }}>
-                  <div className="modal">
-                    <p>
-                      별점평가 기록이 모두 삭제됩니다. 삭제된 내용은 복구 할 수
-                      없어요
-                      <br />
-                      초기화를 하시겠어요?
-                    </p>
-                    <div class="btn-wrapper">
-                      <button onClick={onResetModal}>취소</button>
-                      <button onClick={onReset}>초기화</button>
-                    </div>
-                  </div>
-                </div> */}
               </li>
               <li>
                 <button className="button" onClick={onLogout}>
@@ -96,7 +86,7 @@ function User({
               <li>
                 <button
                   className="btn-unregister"
-                  onClick={unregisterModalOpen}
+                  onClick={() => setUnregisterModal("flex")}
                 >
                   계정 탈퇴
                 </button>
@@ -107,24 +97,6 @@ function User({
                   <br />
                   그래도 탈퇴를 진행하시겠어요?
                 </Modal>
-                {/* <div
-                  className="modal-wrapper"
-                  style={{ display: unregisterModal }}
-                >
-                  <div className="modal">
-                    <strong>{name}님, </strong>
-                    <p>
-                      지금 탈퇴를 하시면 모든 내용이 사라집니다. 한번 삭제된
-                      계정은 영구히 되돌릴 수 없어요.
-                      <br />
-                      그래도 탈퇴를 진행하시겠어요?
-                    </p>
-                    <div class="btn-wrapper">
-                      <button onClick={onUnregisterModal}>취소</button>
-                      <button onClick={onUnregister}>탈퇴</button>
-                    </div>
-                  </div>
-                </div> */}
               </li>
             </ul>
           </div>

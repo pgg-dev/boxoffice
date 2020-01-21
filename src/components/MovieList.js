@@ -13,12 +13,10 @@ function MovieList({
   activeStyle,
   nextDate
 }) {
-  console.log("MovieList");
-
   return (
-    <div className="movie-content">
-      <div className="movie-content__inner">
-        <div className="period">
+    <section className="section section-main">
+      <div className="inner">
+        <div className="period-box">
           <ul>
             <NavLink exact to="/" activeStyle={activeStyle}>
               <li onClick={e => onClick("daily")}>일간</li>
@@ -29,7 +27,7 @@ function MovieList({
             </NavLink>
           </ul>
 
-          <div className="period__date">
+          <div className="period-date">
             <button
               name="prev"
               className="btn-prev"
@@ -49,6 +47,7 @@ function MovieList({
             ></button>
           </div>
         </div>
+
         <ul className="movie-list">
           {movieList.map((movie, index) => (
             <li className="movie-list__item" key={index}>
@@ -70,7 +69,7 @@ function MovieList({
           ))}
         </ul>
       </div>
-    </div>
+    </section>
   );
 }
 

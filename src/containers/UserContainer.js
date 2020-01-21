@@ -28,15 +28,6 @@ function UserContainer() {
     alert("설정이 저장되었습니다.");
   };
 
-  const resetModalOpen = e => {
-    console.log("handleResetModal");
-    if (resetModal === "none") {
-      setResetModal("flex");
-    } else {
-      setResetModal("none");
-    }
-  };
-
   const handleReset = result => {
     if (result) {
       let movieId = [];
@@ -47,23 +38,15 @@ function UserContainer() {
       }
       dispatch(resetComment(movieId, id));
       dispatch(updateUser("commentList", id, []));
+      setResetModal("none");
     } else {
-      resetModalOpen();
-    }
-  };
-
-  const unregisterModalOpen = e => {
-    console.log("handleUnregisterModal");
-    if (unregisterModal === "none") {
-      setUnregisterModal("flex");
-    } else {
-      setUnregisterModal("none");
+      setResetModal("none");
     }
   };
 
   const handleUnregister = result => {
     if (result) {
-      unregisterModalOpen();
+      setUnregisterModal("none");
       if (provider === "kakao") {
         window.Kakao.API.request({
           url: "/v1/user/unlink",
@@ -78,11 +61,12 @@ function UserContainer() {
         const googleAuth = window.gapi.auth2.getAuthInstance();
         googleAuth.disconnect();
       }
+
       dispatch(updateUser("delete", id));
       dispatch(goToPath("/"));
       dispatch(setLogout());
     } else {
-      unregisterModalOpen();
+      setUnregisterModal("none");
     }
   };
 
@@ -116,10 +100,10 @@ function UserContainer() {
       onLogout={handleLogout}
       activeStyle={activeStyle}
       resetModal={resetModal}
-      resetModalOpen={resetModalOpen}
+      setResetModal={setResetModal}
       onReset={handleReset}
       unregisterModal={unregisterModal}
-      unregisterModalOpen={unregisterModalOpen}
+      setUnregisterModal={setUnregisterModal}
       onUnregister={handleUnregister}
     />
   );

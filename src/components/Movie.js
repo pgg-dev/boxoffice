@@ -22,17 +22,15 @@ function Movie({
 }) {
   console.log("components/Movie");
   return (
-    <div className="movie-detail">
-      <div className="movie-detail__inner">
-        <div className="movie-info">
+    <section className="section section-detail">
+      <div className="inner">
+        <div className="movie">
           <span className="movie-poster">
             <img src={movie.poster} alt={movie.title} />
           </span>
-          <div className="movie-info__summary">
-            <h2>{movie.title}</h2>
-            <p>{movie.titleEng}</p>
-
-            <ul>
+          <div className="movie-summary">
+            <h2 className="movie-summary__title">{movie.title}</h2>
+            <ul className="movie-summary__contents">
               <li>
                 <strong>개봉일 :</strong> {movie.openDt}
               </li>
@@ -120,7 +118,7 @@ function Movie({
           </ul>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

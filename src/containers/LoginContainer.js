@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { withRouter } from "react-router-dom";
 import Login from "../components/Login";
-import { setHeaderVisibility, setLogin, goToPath } from "../modules/movies";
+import { setHeaderVisibility, setLogin } from "../modules/movies";
 
-function LoginContainer() {
+function LoginContainer({ history }) {
   console.log("containers/LoginContainer");
   const dispatch = useDispatch();
 
@@ -40,7 +41,7 @@ function LoginContainer() {
   const loginProvider = (provider, id, name) => {
     window.sessionStorage.setItem("provider", provider);
     dispatch(setLogin(provider, id, name));
-    dispatch(goToPath("/"));
+    history.goBack();
   };
 
   return (
@@ -52,4 +53,4 @@ function LoginContainer() {
   );
 }
 
-export default LoginContainer;
+export default withRouter(LoginContainer);

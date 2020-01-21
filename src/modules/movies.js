@@ -4,21 +4,24 @@ import firestore from "../Firestore";
 
 const SET_HEADER_VISIBILITY = "SET_HEADER_VISIBILITY";
 
-const SET_LOGIN = "SET_LOGIN";
-const SET_LOGIN_SUCCESS = "SET_LOGIN_SUCCESS";
-const SET_LOGIN_ERROR = "SET_LOGIN_ERROR";
+// const SET_LOGIN_REQUEST = "SET_LOGIN_REQUEST";
+// const SET_LOGIN_SUCCESS = "SET_LOGIN_SUCCESS";
+// const SET_LOGIN_ERROR = "SET_LOGIN_ERROR";
 const SET_LOGOUT = "SET_LOGOUT";
 
-const GET_USER = "GET_USER";
+const GET_USER_REQUEST = "GET_USER_REQUEST";
+const GET_USER_SUCCESS = "GET_USER_SUCCESS";
+const GET_USER_ERROR = "GET_USER_ERROR";
 
-const GET_MOVIES = "GET_MOVIES";
+const GET_MOVIES_REQUEST = "GET_MOVIES_REQUEST";
 const GET_MOVIES_SUCCESS = "GET_MOVIES_SUCCESS";
 const GET_MOVIES_ERROR = "GET_MOVIES_ERROR";
 
-const GET_MOVIE = "GET_MOVIE";
+const GET_MOVIE_REQUEST = "GET_MOVIE_REQUEST";
 const GET_MOVIE_SUCCESS = "GET_MOVIE_SUCCESS";
 const GET_MOVIE_ERROR = "GET_MOVIE_ERROR";
 
+const GET_COMMENT_REQUEST = "GET_COMMENT_REQUEST";
 const GET_COMMENT_SUCCESS = "GET_COMMENT_SUCCESS";
 const GET_COMMENT_ERROR = "GET_COMMENT_ERROR";
 
@@ -26,14 +29,13 @@ export const goToPath = path => (dispatch, getState, { history }) => {
   history.push(path);
 };
 
-export const setHeaderVisibility = visible => async dispatch => {
+export const setHeaderVisibility = visible => dispatch => {
   console.log("modules/setHeaderVisibility");
   dispatch({ type: SET_HEADER_VISIBILITY, visible });
 };
 
-export const setLogin = (provider, id, name) => async dispatch => {
+export const setLogin = (provider, id, name) => dispatch => {
   console.log("modules/setLogin");
-
   try {
     firestore
       .collection("users")
@@ -60,16 +62,13 @@ export const setLogin = (provider, id, name) => async dispatch => {
           dispatch(getUser(id));
         }
       });
-
-    // dispatch({ type: SET_LOGIN_SUCCESS, id, provider, name });
   } catch (e) {
-    dispatch({ type: SET_LOGIN_ERROR });
+    dispatch({ type: GET_USER_ERROR, error: e });
   }
 };
 
 export const updateUser = (item, id, data) => dispatch => {
   console.log("updateUser");
-
   try {
     firestore
       .collection("users")
@@ -89,11 +88,14 @@ export const updateUser = (item, id, data) => dispatch => {
           }
         });
       });
-  } catch (e) {}
+  } catch (e) {
+    dispatch({ type: GET_USER_ERROR, error: e });
+  }
 };
 
 export const getUser = id => dispatch => {
   console.log("getUser");
+  dispatch({ type: GET_USER_REQUEST });
   try {
     firestore
       .collection("users")
@@ -110,7 +112,7 @@ export const getUser = id => dispatch => {
             commentList
           } = doc.data();
           dispatch({
-            type: GET_USER,
+            type: GET_USER_SUCCESS,
             id,
             name,
             provider,
@@ -120,42 +122,28 @@ export const getUser = id => dispatch => {
           });
         });
       });
-  } catch (e) {}
+  } catch (e) {
+    dispatch({
+      type: GET_USER_ERROR,
+      error: e
+    });
+  }
 };
 
-export const setLogout = () => async dispatch => {
+export const setLogout = () => dispatch => {
+  dispatch({ type: SET_LOGOUT });
   window.sessionStorage.clear();
   dispatch(goToPath("/"));
-  dispatch({ type: SET_LOGOUT });
 };
 
-export const getMovies = (period, date) => async (dispatch, getState) => {
+export const getMovies = (period, date) => (dispatch, getState) => {
   console.log("getMovies");
-  console.log(period);
-  console.log(date);
-  dispatch({ type: GET_MOVIES });
+  dispatch({ type: GET_MOVIES_REQUEST });
 
   let { movieList } = getState().movies.movies;
   const key = "8512edd89b714bf2cf35fcb50adac48d";
   let rankingData = [];
   let showRange;
-
-  const getRankingData = async api => {
-    const {
-      data: { boxOfficeResult }
-    } = await axios.get(
-      `http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/${api}.json`,
-      {
-        params: {
-          key,
-          targetDt: date,
-          weekGb: 0
-        }
-      }
-    );
-    showRange = boxOfficeResult.showRange.split("~");
-    return boxOfficeResult;
-  };
 
   const setMovies = rankingData => {
     return new Promise(resolve => {
@@ -220,7 +208,7 @@ export const getMovies = (period, date) => async (dispatch, getState) => {
     });
   };
 
-  const getData = rankingData => {
+  const getMovieData = rankingData => {
     return new Promise(resolve => {
       firestore
         .collection("movies")
@@ -228,7 +216,7 @@ export const getMovies = (period, date) => async (dispatch, getState) => {
         .get()
         .then(doc => {
           if (!doc.exists) {
-            setMovies(rankingData).then(data => resolve(getData(data)));
+            setMovies(rankingData).then(data => resolve(getMovieData(data)));
           } else {
             resolve(doc.data());
           }
@@ -238,7 +226,7 @@ export const getMovies = (period, date) => async (dispatch, getState) => {
 
   const getMovieList = () => {
     for (let i = 0; i < rankingData.length; i++) {
-      movieList.push(getData(rankingData[i]));
+      movieList.push(getMovieData(rankingData[i]));
     }
     Promise.all(movieList).then(movieList => {
       dispatch({
@@ -251,22 +239,36 @@ export const getMovies = (period, date) => async (dispatch, getState) => {
     });
   };
 
-  if (period === "daily") {
-    getRankingData("searchDailyBoxOfficeList").then(data => {
-      rankingData = data.dailyBoxOfficeList;
-      getMovieList();
-    });
-  } else {
-    getRankingData("searchWeeklyBoxOfficeList").then(data => {
-      rankingData = data.weeklyBoxOfficeList;
-      getMovieList();
-    });
+  try {
+    axios
+      .get(
+        `http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/search${
+          period === "daily" ? "Daily" : "Weekly"
+        }BoxOfficeList.json`,
+        {
+          params: {
+            key,
+            targetDt: date,
+            weekGb: 0
+          }
+        }
+      )
+      .then(val => {
+        const data = val.data.boxOfficeResult;
+        period === "daily"
+          ? (rankingData = data.dailyBoxOfficeList)
+          : (rankingData = data.weeklyBoxOfficeList);
+        showRange = data.showRange.split("~");
+        getMovieList();
+      });
+  } catch (e) {
+    dispatch({ type: GET_MOVIES_ERROR, error: e });
   }
 };
 
-export const getMovie = movieId => async dispatch => {
+export const getMovie = movieId => dispatch => {
   console.log("modules/getMovie");
-  dispatch({ type: GET_MOVIE });
+  dispatch({ type: GET_MOVIE_REQUEST });
   try {
     firestore
       .collection("movies")
@@ -274,7 +276,6 @@ export const getMovie = movieId => async dispatch => {
       .get()
       .then(doc => {
         const payload = doc.data();
-        console.log(payload);
         dispatch({ type: GET_MOVIE_SUCCESS, payload });
       });
   } catch (e) {
@@ -282,8 +283,9 @@ export const getMovie = movieId => async dispatch => {
   }
 };
 
-export const getComment = movieId => async dispatch => {
+export const getComment = movieId => dispatch => {
   console.log("getComment");
+  dispatch({ type: GET_COMMENT_REQUEST });
   try {
     firestore
       .collection("movies")
@@ -346,7 +348,8 @@ const initialState = {
     name: null,
     provider: null,
     wishList: [],
-    commentList: []
+    commentList: [],
+    error: null
   },
   movies: {
     loading: false,
@@ -373,31 +376,43 @@ export default function movies(state = initialState, action) {
         ...state,
         visible: action.visible
       };
-    case SET_LOGIN:
+    case GET_USER_REQUEST:
       return {
         ...state,
         user: {
-          login: false,
+          login: state.user.login,
           id: null,
-          type: null
+          name: null,
+          provider: null,
+          wishList: [],
+          commentList: [],
+          error: null
         }
       };
-    case SET_LOGIN_SUCCESS:
+    case GET_USER_SUCCESS:
       return {
         ...state,
         user: {
           login: true,
           id: action.id,
           name: action.name,
-          provider: action.provider
+          provider: action.provider,
+          wishList: action.wishList,
+          commentList: action.commentList,
+          error: null
         }
       };
-    case SET_LOGIN_ERROR:
+    case GET_USER_ERROR:
       return {
         ...state,
         user: {
           login: false,
-          id: null
+          id: null,
+          name: null,
+          provider: null,
+          wishList: [],
+          commentList: [],
+          error: action.error
         }
       };
     case SET_LOGOUT:
@@ -409,24 +424,11 @@ export default function movies(state = initialState, action) {
           name: null,
           provider: null,
           wishList: [],
-          commentList: []
+          commentList: [],
+          error: null
         }
       };
-
-    case GET_USER:
-      return {
-        ...state,
-        user: {
-          login: true,
-          id: action.id,
-          name: action.name,
-          provider: action.provider,
-          wishList: action.wishList,
-          commentList: action.commentList
-        }
-      };
-
-    case GET_MOVIES:
+    case GET_MOVIES_REQUEST:
       return {
         ...state,
         visible: true,
@@ -464,7 +466,7 @@ export default function movies(state = initialState, action) {
           period: null
         }
       };
-    case GET_MOVIE:
+    case GET_MOVIE_REQUEST:
       return {
         ...state,
         movie: {

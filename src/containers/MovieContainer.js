@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Movie from "../components/Movie";
+import load from "../images/load.gif";
 import {
   getMovie,
   updateComment,
@@ -30,11 +31,6 @@ function MovieContainer({ movieId }) {
     if (!movieList) {
       movieData = JSON.parse(window.localStorage.getItem(movieId));
     } else {
-      // if (url.includes("daily")) {
-      //   movieData = dailyData.find(movie => movie.id === movieId);
-      // } else {
-      //   movieData = weeklyData.find(movie => movie.id === movieId);
-      // }
       window.localStorage.setItem(movieId, JSON.stringify(movieData));
     }
     dispatch(getMovie(movieId));
@@ -46,25 +42,10 @@ function MovieContainer({ movieId }) {
     });
     setStar("");
     dispatch(getComment(movieId));
-    // deleteBtnVisible();
     return () => {
       window.localStorage.clear();
     };
   }, [dispatch, movieId]);
-
-  // const loginCheck = callback => {
-  //   if (!login) {
-  //     console.log("로그인 ㄴㄴ");
-  //     const isLogin = window.confirm("로그인 페이지로 이동 하시겠습니까?");
-  //     if (isLogin) {
-  //       dispatch(goToPath("/login"));
-  //     }
-  //     // return;
-  //   } else {
-  //     console.log("로그인 상태");
-  //     callback();
-  //   }
-  // };
 
   const loginCheck = result => {
     if (result) {
@@ -176,7 +157,12 @@ function MovieContainer({ movieId }) {
     }
   };
 
-  if (loading && !data) return <div>로딩중...</div>;
+  if (loading && !data)
+    return (
+      <div>
+        <img src={load} alt="Loading" />
+      </div>
+    );
   if (error) return <div>에러 발생</div>;
   if (!data) return <div>데이터 없음</div>;
 

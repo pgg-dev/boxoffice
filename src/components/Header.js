@@ -6,10 +6,10 @@ import "../styles/Header.scss";
 
 function Header({ login, onSearch, onChange, date, onClick, name }) {
   return (
-    <header className="header">
-      <div className="header__inner">
-        <h1 className="header__title" onClick={onClick}>
-          <Link className="header__link" to="/">
+    <header className="header section">
+      <div className="inner">
+        <h1 className="header-title" onClick={onClick}>
+          <Link className="header-title__link" to="/">
             BOX OFFICE
           </Link>
         </h1>

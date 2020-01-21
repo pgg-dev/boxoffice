@@ -1,14 +1,39 @@
 @import "https://fonts.googleapis.com/css?family=Viga&display=swap";
 @import "https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800&display=swap";
 
-body {
-  background-color: #fff;
+* {
+  box-sizing: border-box;
 }
 
+body {
+  background-color: #fff;
+  font-family: "Nanum Gothic", sans-serif;
+}
 .wrap {
-  max-width: 1300px;
-  height: 100%;
-  margin: 0 auto;
   text-align: center;
 }
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+button {
+  outline: none;
+  cursor: pointer;
+}
+
+.section {
+  position: relative;
+
+  & .inner {
+    // border: 1px solid greenyellow;
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+}
+
 //node-sass 사스로 작성된 코드 css 로 변환

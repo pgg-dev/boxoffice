@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Header from "../components/Header";
-import { getUser } from "../modules/movies";
-import { getMovies } from "../modules/movies";
+import { getMovies, getUser } from "../modules/movies";
 import moment from "moment";
 import { withRouter } from "react-router-dom";
 
@@ -11,7 +10,7 @@ function HeaderContainer() {
 
   const { visible } = useSelector(state => state.movies);
   const { period } = useSelector(state => state.movies.movies);
-  const { login, id,name } = useSelector(state => state.movies.user);
+  const { login, id, name } = useSelector(state => state.movies.user);
   const dispatch = useDispatch();
   const [date, setDate] = useState("");
 
@@ -34,7 +33,7 @@ function HeaderContainer() {
             window.gapi.auth2
               .init({
                 client_id:
-                  "822311017221-vqnjoe6mjbljr9cp1dvoeahjil2mhh9v.apps.googleusercontent.com"
+                  "822311017221-b5432nvimnhii88bt8eschpnsk402ibq.apps.googleusercontent.com"
               })
               .then(user => {
                 const userId = user.currentUser.get().getId();
